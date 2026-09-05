@@ -1,0 +1,34 @@
+{
+  "kind": "collectionType",
+  "collectionName": "journey_events",
+  "info": {
+    "singularName": "journey-event",
+    "pluralName": "journey-events",
+    "displayName": "Journey event",
+    "description": "An event on the life/development timeline"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "year": { "type": "string" },
+    "category": {
+      "type": "enumeration",
+      "enum": ["work", "life", "projects", "small"],
+      "required": true
+    },
+    "size": {
+      "type": "enumeration",
+      "enum": ["s", "m", "l"],
+      "default": "m",
+      "required": true
+    },
+    "title": { "type": "string", "required": true },
+    "body": { "type": "text" },
+    "note": { "type": "string" },
+    "visibility": {
+      "type": "enumeration",
+      "enum": ["public", "unlisted", "private"],
+      "default": "public",
+      "required": true
+    }
+  }
+}

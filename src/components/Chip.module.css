@@ -1,0 +1,38 @@
+.chip {
+  background: transparent;
+  color: var(--ink-faint);
+  border: 1px solid var(--line);
+  padding: 6px 12px;
+  font-family: var(--font-mono-stack);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.chip:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.active:hover {
+  color: var(--paper);
+}
+
+/* On dark surfaces, the active chip glows in the warm accent. */
+.dark.active {
+  background: #ff6a45;
+  border-color: #ff6a45;
+  color: #151318;
+}
+.dark {
+  color: #cfc6b4;
+  border-color: #4a4436;
+}
+.dark:hover {
+  color: #fff;
+  border-color: #6a6252;
+}

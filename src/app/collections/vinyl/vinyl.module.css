@@ -1,0 +1,194 @@
+/* Vinyl world: independent record shop / zine. Crate-dug, hand-labelled. */
+.page {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 44px var(--gutter) 90px;
+}
+.intro {
+  max-width: 620px;
+  margin-bottom: 30px;
+}
+.storefront {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.openSign {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8fbf7a;
+  border: 1px solid currentColor;
+  padding: 3px 8px;
+}
+.stock {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--mute);
+}
+.title {
+  font-family: var(--font-display-stack);
+  font-weight: 400;
+  font-size: clamp(40px, 6.5vw, 66px);
+  line-height: 0.98;
+  margin-bottom: 12px;
+}
+.lede {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 50ch;
+}
+
+/* Shelf */
+.shelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 24px 18px;
+}
+.tile {
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transform: rotate(var(--rot, 0deg));
+  transition: transform 0.15s ease;
+}
+.tile:hover {
+  transform: rotate(0deg) translateY(-4px);
+}
+.sleeve {
+  aspect-ratio: 1;
+  border: 1px solid rgba(23, 21, 15, 0.35);
+  box-shadow: 3px 4px 0 rgba(23, 21, 15, 0.14);
+  position: relative;
+  display: block;
+}
+.sleeveCat {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  font-family: var(--font-mono-stack);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: #fff;
+  mix-blend-mode: difference;
+}
+.tileArtist {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.tileTitle {
+  font-family: var(--font-display-stack);
+  font-size: 19px;
+  line-height: 1.1;
+}
+
+/* Modal */
+.dialog {
+  border: 1px solid var(--ink);
+  padding: 0;
+  max-width: 640px;
+  width: calc(100% - 32px);
+  background: var(--surface-raised);
+  color: var(--ink);
+  box-shadow: 8px 10px 0 rgba(23, 21, 15, 0.25);
+}
+.dialog::backdrop {
+  background: rgba(23, 21, 15, 0.55);
+  backdrop-filter: blur(2px);
+}
+.record {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+}
+.recordSleeve {
+  position: relative;
+}
+.recordCat {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #fff;
+  mix-blend-mode: difference;
+}
+.recordBody {
+  position: relative;
+  padding: 24px 24px 26px;
+}
+.close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: 1px solid var(--line);
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  color: var(--ink-faint);
+  line-height: 1;
+}
+.close:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.recordArtist {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+.recordTitle {
+  font-family: var(--font-display-stack);
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1.06;
+  margin: 4px 0 16px;
+  max-width: 22ch;
+}
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 18px;
+  margin: 0 0 16px;
+}
+.facts dt {
+  font-family: var(--font-mono-stack);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.facts dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+}
+.recordNote {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  border-top: 1px dashed var(--line);
+  padding-top: 14px;
+}
+
+@media (max-width: 540px) {
+  .record {
+    grid-template-columns: 1fr;
+  }
+  .recordSleeve {
+    aspect-ratio: 3 / 1;
+  }
+}

@@ -1,0 +1,40 @@
+# Caddy config. Caddy provisions and renews Let's Encrypt TLS automatically
+# once these names resolve (DNS A/AAAA → this server) and ports 80/443 are open.
+# ACME contact email — override with {$ACME_EMAIL} in the environment.
+{
+	email {$ACME_EMAIL:hello@olegthelilfix.com}
+}
+
+(security) {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), browsing-topics=()"
+		-Server
+	}
+}
+
+# Frontend (Next.js)
+olegthelilfix.com {
+	import security
+	reverse_proxy web:3000
+}
+
+# www → apex redirect
+www.olegthelilfix.com {
+	redir https://olegthelilfix.com{uri} permanent
+}
+
+# Strapi CMS admin + API
+cms.olegthelilfix.com {
+	import security
+	reverse_proxy cms:1337
+}
+
+# n8n automation
+n8n.olegthelilfix.com {
+	import security
+	reverse_proxy n8n:5678
+}

@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_cv_sections",
+  "info": {
+    "displayName": "CV section",
+    "description": "A titled group of CV rows"
+  },
+  "options": {},
+  "attributes": {
+    "title": { "type": "string", "required": true },
+    "rows": {
+      "type": "component",
+      "repeatable": true,
+      "component": "cv.row"
+    }
+  }
+}

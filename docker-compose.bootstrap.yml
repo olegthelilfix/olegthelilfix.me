@@ -1,0 +1,13 @@
+# First-run override. It publishes web, CMS and n8n on the server loopback only,
+# so the site can be checked and the initial owner accounts can be created
+# through SSH tunnels before Caddy makes the public hostnames reachable.
+services:
+  web:
+    ports:
+      - "127.0.0.1:3000:3000"
+  cms:
+    ports:
+      - "127.0.0.1:1337:1337"
+  n8n:
+    ports:
+      - "127.0.0.1:5678:5678"

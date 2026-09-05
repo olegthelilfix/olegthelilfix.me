@@ -1,0 +1,248 @@
+/* Shared shell for the lighter supporting pages (articles, projects, photos,
+   hobbies, now). Consistent intro + container; each page adds its own content. */
+.page {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 44px var(--gutter) 90px;
+}
+.intro {
+  max-width: 640px;
+  margin-bottom: 30px;
+}
+.kicker {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.title {
+  font-family: var(--font-display-stack);
+  font-weight: 400;
+  font-size: clamp(40px, 6.5vw, 66px);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  margin: 10px 0 12px;
+}
+.lede {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 56ch;
+}
+
+/* Articles — literary journal index. */
+.articleList {
+  display: grid;
+  gap: 4px;
+}
+.article {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+.articleKind {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+.articleTitle {
+  font-family: var(--font-display-stack);
+  font-weight: 400;
+  font-size: clamp(24px, 3.4vw, 32px);
+  line-height: 1.08;
+}
+.articleExcerpt {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 66ch;
+}
+.articleMeta {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  color: var(--mute);
+}
+
+/* Projects — engineering lab cards. */
+.projectGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+}
+.project {
+  border: 1px solid var(--ink);
+  background: var(--surface-raised);
+  display: flex;
+  flex-direction: column;
+}
+.projectDiagram {
+  height: 90px;
+  opacity: 0.85;
+}
+.projectBody {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+.projectTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.projectCode {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--mute);
+}
+.projectStatus {
+  font-family: var(--font-mono-stack);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  padding: 2px 6px;
+}
+.projectName {
+  font-family: var(--font-display-stack);
+  font-size: 24px;
+  line-height: 1.08;
+}
+.projectDesc {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.projectFoot {
+  margin-top: auto;
+  display: grid;
+  gap: 4px;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+.projectRow {
+  font-family: var(--font-mono-stack);
+  font-size: 10.5px;
+  color: var(--mute);
+}
+.projectLearned {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+/* Photos — contact sheet. */
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+.photo {
+  background: #fff;
+  padding: 10px 10px 0;
+  border: 1px solid #cfc7b5;
+  box-shadow: 2px 3px 0 rgba(23, 21, 15, 0.12);
+}
+.photoImg {
+  aspect-ratio: 4 / 3;
+}
+.photoCaption {
+  font-family: var(--font-hand-stack);
+  font-size: 19px;
+  padding: 8px 2px 2px;
+  color: var(--ink-soft);
+  line-height: 1.2;
+}
+.photoMeta {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--mute);
+  padding: 2px 2px 10px;
+}
+
+/* Hobbies — mixed cards. */
+.hobbyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+.hobby {
+  padding: 20px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--ink);
+  background: var(--surface-raised);
+  text-decoration: none;
+}
+.hobby:hover {
+  box-shadow: 3px 4px 0 rgba(23, 21, 15, 0.14);
+}
+.hobbyName {
+  font-family: var(--font-display-stack);
+  font-size: 34px;
+  line-height: 1.05;
+}
+.hobbyTag {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+.hobbyBody {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* Now — a snapshot list. */
+.nowList {
+  display: grid;
+  gap: 0;
+  max-width: 760px;
+}
+.nowRow {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px 24px;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+}
+.nowLabel {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--acc);
+  padding-top: 2px;
+}
+.nowText {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+.nowStamp {
+  font-family: var(--font-hand-stack);
+  font-size: 20px;
+  color: var(--mute);
+  margin-top: 26px;
+}
+
+@media (max-width: 560px) {
+  .nowRow {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}

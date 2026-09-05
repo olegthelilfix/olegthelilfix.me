@@ -1,0 +1,120 @@
+/* Collections world: a chest of mismatched drawers. */
+.page {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 44px var(--gutter) 90px;
+}
+.intro {
+  max-width: 600px;
+  margin-bottom: 28px;
+}
+.kicker {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.title {
+  font-family: var(--font-display-stack);
+  font-weight: 400;
+  font-size: clamp(40px, 6.5vw, 66px);
+  line-height: 0.98;
+  margin: 10px 0 12px;
+}
+.lede {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+
+.cabinet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.drawer {
+  border: 1px solid var(--ink);
+  padding: 18px;
+  min-height: 172px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.drawer:hover {
+  transform: translateY(-3px);
+  box-shadow: 4px 6px 0 rgba(23, 21, 15, 0.16);
+}
+.drawerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.code,
+.soon {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.soon {
+  border: 1px solid currentColor;
+  padding: 2px 5px;
+}
+.name {
+  font-family: var(--font-display-stack);
+  font-size: 30px;
+  line-height: 1.05;
+}
+.note {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+.count {
+  margin-top: auto;
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+/* Drawer tones — each a slightly different material. */
+.tone_ink {
+  background: #151318;
+  color: #f0ece2;
+}
+.tone_paper {
+  background: #fbf7ec;
+  color: var(--ink);
+  box-shadow: 4px 4px 0 rgba(23, 21, 15, 0.12);
+}
+.tone_sand {
+  background: #e6e0d3;
+  color: var(--ink);
+}
+.tone_sage {
+  background: #dfe7e3;
+  color: #1b2a25;
+  border-color: #a9b7b0;
+}
+.tone_stone {
+  background: #eef0ea;
+  color: #232821;
+  border-style: dashed;
+}
+.tone_lilac {
+  background: #efe6f2;
+  color: #2b2130;
+}
+.tone_yellow {
+  background: #fff6b8;
+  color: #33301f;
+  transform: rotate(-1deg);
+}
+.tone_yellow:hover {
+  transform: translateY(-3px) rotate(-1deg);
+}

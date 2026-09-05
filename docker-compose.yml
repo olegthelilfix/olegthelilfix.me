@@ -1,0 +1,166 @@
+# Full stack: Caddy (TLS) + Next.js frontend + Strapi CMS + Postgres + n8n.
+# Copy .env.docker.example to .env, fill the secrets, then: docker compose up -d --build
+#
+# Domains (point DNS A/AAAA records at this server):
+#   olegthelilfix.com       -> web  (frontend)
+#   www.olegthelilfix.com   -> redirect to apex
+#   cms.olegthelilfix.com   -> cms  (Strapi admin + API)
+#   n8n.olegthelilfix.com   -> n8n
+name: olegthelilfix
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL:-hello@olegthelilfix.com}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+      cms:
+        condition: service_healthy
+      n8n:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:2019/config/ >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_ADMIN_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:-${DATABASE_PASSWORD:?set POSTGRES_ADMIN_PASSWORD in .env}}
+      STRAPI_DATABASE_NAME: ${STRAPI_DATABASE_NAME:-${DATABASE_NAME:-strapi}}
+      STRAPI_DATABASE_USERNAME: ${STRAPI_DATABASE_USERNAME:-strapi}
+      STRAPI_DATABASE_PASSWORD: ${STRAPI_DATABASE_PASSWORD:-${DATABASE_PASSWORD:?set STRAPI_DATABASE_PASSWORD in .env}}
+      N8N_DATABASE_NAME: ${N8N_DATABASE_NAME:-n8n}
+      N8N_DATABASE_USERNAME: ${N8N_DATABASE_USERNAME:-n8n}
+      N8N_DATABASE_PASSWORD: ${N8N_DATABASE_PASSWORD:-${DATABASE_PASSWORD:?set N8N_DATABASE_PASSWORD in .env}}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      # Creates separate least-privilege roles/databases on first init.
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_ADMIN_USERNAME:-postgres} -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  cms:
+    build: ./cms
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 1337
+      # Behind Caddy: know the public https origin and trust proxy headers.
+      PUBLIC_URL: https://cms.olegthelilfix.com
+      IS_PROXIED: "true"
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${STRAPI_DATABASE_NAME:-${DATABASE_NAME:-strapi}}
+      DATABASE_USERNAME: ${STRAPI_DATABASE_USERNAME:-strapi}
+      DATABASE_PASSWORD: ${STRAPI_DATABASE_PASSWORD:-${DATABASE_PASSWORD:?set STRAPI_DATABASE_PASSWORD in .env}}
+      DATABASE_SSL: "false"
+      APP_KEYS: ${APP_KEYS:?set APP_KEYS in .env}
+      API_TOKEN_SALT: ${API_TOKEN_SALT:?set API_TOKEN_SALT in .env}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:?set ADMIN_JWT_SECRET in .env}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT:?set TRANSFER_TOKEN_SALT in .env}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY in .env}
+    volumes:
+      - cms-uploads:/opt/app/public/uploads
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:1337/_health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
+
+  web:
+    build: .
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      cms:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      # The frontend reaches the CMS over the internal compose network.
+      STRAPI_URL: http://cms:1337
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.35.5
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      N8N_HOST: n8n.olegthelilfix.com
+      N8N_PORT: 5678
+      N8N_PROTOCOL: https
+      NODE_ENV: production
+      WEBHOOK_URL: https://n8n.olegthelilfix.com/
+      N8N_EDITOR_BASE_URL: https://n8n.olegthelilfix.com/
+      # n8n sits behind one reverse proxy (Caddy) — trust exactly one hop.
+      N8N_PROXY_HOPS: 1
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?set N8N_ENCRYPTION_KEY in .env}
+      GENERIC_TIMEZONE: ${TZ:-Europe/Berlin}
+      TZ: ${TZ:-Europe/Berlin}
+      # Shared Postgres (its own `n8n` database, same instance as Strapi).
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: db
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: ${N8N_DATABASE_NAME:-n8n}
+      DB_POSTGRESDB_USER: ${N8N_DATABASE_USERNAME:-n8n}
+      DB_POSTGRESDB_PASSWORD: ${N8N_DATABASE_PASSWORD:-${DATABASE_PASSWORD:?set N8N_DATABASE_PASSWORD in .env}}
+      DB_POSTGRESDB_SCHEMA: public
+    volumes:
+      # Still used for the instance's runtime files (not the workflow DB).
+      - n8n-data:/home/node/.n8n
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5678/healthz').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
+
+volumes:
+  db-data:
+  cms-uploads:
+  caddy-data:
+  caddy-config:
+  n8n-data:

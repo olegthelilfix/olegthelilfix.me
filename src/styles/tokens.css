@@ -1,0 +1,29 @@
+/* Global design tokens. The per-section "worlds" build on top of these so the
+   site stays coherent even while each section looks distinct. */
+:root {
+  /* Palette */
+  --acc: #c0442a; /* accent — swappable (terracotta by default) */
+  --paper: #f4f1ea; /* card / page surface */
+  --ink: #17150f; /* primary text */
+  --page: #e9e5db; /* body backdrop behind the paper */
+  --ink-soft: #433d31;
+  --ink-faint: #5b5347;
+  --mute: #8a8272; /* mono labels, captions */
+  --line: #b9b1a0; /* hairline borders */
+  --line-dash: #c8c0ae;
+  --surface-raised: #fffdf7;
+
+  /* Type — self-hosted from @fontsource packages, with system fallbacks. */
+  --font-display-stack: "Instrument Serif", Georgia, serif;
+  --font-body-stack: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-mono-stack: "IBM Plex Mono", ui-monospace, monospace;
+  --font-hand-stack: "Caveat", "Segoe Script", cursive;
+
+  /* Spacing / layout */
+  --maxw: 1280px;
+  --gutter: 16px;
+
+  /* A mono label — reused across every section for coherence. */
+  --label-size: 10.5px;
+  --label-track: 0.14em;
+}

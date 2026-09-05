@@ -1,0 +1,137 @@
+/* CV world: strict, minimal, print-first. Almost monochrome, generous space. */
+.sheet {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 56px var(--gutter) 96px;
+  background: var(--surface-raised);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 32px;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 22px;
+  margin-bottom: 30px;
+}
+.headMain {
+  flex: 1 1 320px;
+}
+.name {
+  font-family: var(--font-display-stack);
+  font-weight: 400;
+  font-size: clamp(38px, 6vw, 56px);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+.role {
+  font-family: var(--font-mono-stack);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--acc);
+  margin-top: 10px;
+}
+.summary {
+  margin-top: 16px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 58ch;
+}
+
+.headSide {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+  font-family: var(--font-mono-stack);
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+.contactLine a {
+  border-bottom-color: var(--line);
+}
+.print {
+  margin-top: 12px;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+  padding: 8px 14px;
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background 0.15s ease;
+}
+.print:hover {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: #fff;
+}
+
+.section {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 14px 28px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+.sectionTitle {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mute);
+  padding-top: 3px;
+}
+.rows {
+  display: grid;
+  gap: 18px;
+}
+.rowHead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.rowTitle {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.rowMeta {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  color: var(--mute);
+  white-space: nowrap;
+}
+.rowBody {
+  margin-top: 4px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 66ch;
+}
+
+@media (max-width: 640px) {
+  .section {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media print {
+  .sheet {
+    padding: 0;
+    max-width: none;
+    background: #fff;
+  }
+  .section {
+    break-inside: avoid;
+  }
+}

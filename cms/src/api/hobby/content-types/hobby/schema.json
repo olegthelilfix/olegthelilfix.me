@@ -1,0 +1,23 @@
+{
+  "kind": "collectionType",
+  "collectionName": "hobbies",
+  "info": {
+    "singularName": "hobby",
+    "pluralName": "hobbies",
+    "displayName": "Hobby",
+    "description": "A hobby / interest doorway"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "name": { "type": "string", "required": true },
+    "tag": { "type": "string" },
+    "body": { "type": "text" },
+    "href": { "type": "string" },
+    "visibility": {
+      "type": "enumeration",
+      "enum": ["public", "unlisted", "private"],
+      "default": "public",
+      "required": true
+    }
+  }
+}

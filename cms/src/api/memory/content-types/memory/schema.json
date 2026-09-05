@@ -1,0 +1,23 @@
+{
+  "kind": "collectionType",
+  "collectionName": "memories",
+  "info": {
+    "singularName": "memory",
+    "pluralName": "memories",
+    "displayName": "Memory",
+    "description": "A piece of evidence for the Remember page"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "kind": { "type": "string", "required": true },
+    "title": { "type": "string", "required": true },
+    "body": { "type": "text" },
+    "filedUnder": { "type": "string" },
+    "visibility": {
+      "type": "enumeration",
+      "enum": ["public", "unlisted", "private"],
+      "default": "public",
+      "required": true
+    }
+  }
+}

@@ -1,0 +1,106 @@
+/* Remember world: quiet, warm, single-focus. Supportive, not motivational. */
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 56px var(--gutter) 96px;
+}
+
+.intro {
+  margin-bottom: 30px;
+}
+.kicker {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+.title {
+  font-family: var(--font-display-stack);
+  font-weight: 400;
+  font-size: clamp(36px, 6vw, 58px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin: 10px 0 14px;
+}
+.lede {
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 54ch;
+}
+
+.deck {
+  margin-top: 10px;
+}
+.card {
+  background: var(--surface-raised);
+  border: 1px solid var(--ink);
+  box-shadow: 5px 6px 0 rgba(23, 21, 15, 0.1);
+  padding: 34px 30px 26px;
+  animation: riseIn 0.32s ease both;
+}
+.kind {
+  font-family: var(--font-mono-stack);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--acc);
+  margin-bottom: 14px;
+}
+.cardTitle {
+  font-family: var(--font-display-stack);
+  font-weight: 400;
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 1.15;
+  margin: 0 0 14px;
+}
+.cardBody {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+.stamp {
+  margin-top: 22px;
+  display: inline-block;
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mute);
+  border: 1px solid var(--line);
+  padding: 4px 8px;
+  transform: rotate(-1.5deg);
+}
+
+.controls {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+.progress {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.next {
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+  padding: 10px 16px;
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 0.15s ease;
+}
+.next:hover {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: #fff;
+}

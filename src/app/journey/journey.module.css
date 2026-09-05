@@ -1,0 +1,144 @@
+/* Journey world: a museum wall / pinned archive. Masonry columns, slight
+   rotations, mixed card sizes so big and small moments coexist. */
+.page {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 44px var(--gutter) 90px;
+}
+
+.intro {
+  max-width: 640px;
+  margin-bottom: 26px;
+}
+.kicker {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.title {
+  font-family: var(--font-display-stack);
+  font-weight: 400;
+  font-size: clamp(40px, 6.5vw, 66px);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  margin: 10px 0 12px;
+}
+.lede {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 56ch;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  padding: 14px 0 26px;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px dashed var(--line);
+  margin-bottom: 28px;
+}
+.count {
+  font-family: var(--font-mono-stack);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mute);
+  margin-left: auto;
+}
+
+/* Masonry via CSS columns — cheap, reflows to one column on mobile. */
+.wall {
+  columns: 3 300px;
+  column-gap: 18px;
+}
+.card {
+  break-inside: avoid;
+  margin: 0 0 16px;
+  transform: rotate(var(--rot, 0deg));
+}
+.cardMeta {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.year {
+  color: var(--acc);
+  font-weight: 600;
+}
+.cat {
+  color: var(--mute);
+}
+.cardTitle {
+  font-family: var(--font-display-stack);
+  font-weight: 400;
+  line-height: 1.12;
+}
+.cardBody {
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 1.55;
+}
+.note {
+  margin-top: 10px;
+  font-family: var(--font-hand-stack);
+  font-size: 20px;
+  color: var(--acc);
+  transform: rotate(-2deg);
+}
+
+/* Large: dark placard. Medium: raised paper card. Small: quiet hairline row. */
+.size_l {
+  background: var(--ink);
+  color: #f0ece2;
+  padding: 20px;
+  border: 1px solid var(--ink);
+}
+.size_l .cardTitle {
+  font-size: 30px;
+}
+.size_l .cat {
+  color: #a49a86;
+}
+.size_m {
+  background: var(--surface-raised);
+  padding: 16px;
+  border: 1px solid var(--line);
+  box-shadow: 2px 3px 0 rgba(23, 21, 15, 0.08);
+}
+.size_m .cardTitle {
+  font-size: 23px;
+}
+.size_s {
+  background: transparent;
+  padding: 10px 2px;
+  border-top: 1px solid var(--line-dash);
+}
+.size_s .cardTitle {
+  font-family: var(--font-mono-stack);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none;
+}
+.size_s .cardBody {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 640px) {
+  .wall {
+    columns: 1;
+  }
+  .card {
+    transform: none;
+  }
+}

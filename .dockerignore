@@ -1,0 +1,18 @@
+node_modules
+.next
+.git
+.gitignore
+npm-debug.log*
+Dockerfile
+.dockerignore
+docker-compose.yml
+# separate app / archives, not part of the frontend image
+cms
+reference
+# local env + editor + plans
+.env*
+!.env.docker.example
+.vscode
+.idea
+.claude
+*.md

@@ -1,0 +1,18 @@
+.button {
+  margin-left: auto;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+  padding: 6px 12px;
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+.button:hover {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: #fff;
+}

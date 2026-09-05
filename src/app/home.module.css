@@ -1,0 +1,359 @@
+/* Home world: a shifting collage. The dotted-paper backdrop, an eclectic grid
+   of cards from every corner of the site. Density gates how much appears. */
+.page {
+  min-height: 100vh;
+  background: var(--paper);
+  background-image: radial-gradient(#dcd6c8 1px, transparent 1px);
+  background-size: 22px 22px;
+  max-width: none;
+}
+
+.hero,
+.densityBar,
+.collage {
+  max-width: var(--maxw);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+.hero {
+  max-width: 680px;
+  margin: 0 auto;
+  padding-top: 44px;
+  padding-bottom: 8px;
+}
+.name {
+  font-family: var(--font-display-stack);
+  font-weight: 400;
+  font-size: clamp(44px, 8vw, 82px);
+  line-height: 0.94;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+}
+.tagline {
+  font-size: 19px;
+  line-height: 1.5;
+  max-width: 54ch;
+  color: var(--ink-soft);
+}
+.est {
+  margin-top: 16px;
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.densityBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding-top: 20px;
+  padding-bottom: 22px;
+  margin-top: 20px;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px dashed var(--line);
+}
+.densityLabel {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.densityChips {
+  display: flex;
+  gap: 6px;
+}
+.densityNote {
+  font-family: var(--font-hand-stack);
+  font-size: 18px;
+  color: var(--acc);
+  transform: rotate(-2deg);
+}
+
+.collage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: flex-start;
+  padding-top: 28px;
+  padding-bottom: 80px;
+}
+.collage > * {
+  animation: riseIn 0.4s ease both;
+}
+
+.eyebrow {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mute);
+  margin-bottom: 10px;
+}
+.eyebrowAccent {
+  composes: eyebrow;
+  color: var(--acc);
+}
+.stampMono {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  color: var(--mute);
+  margin-top: 14px;
+}
+
+/* Achievement card */
+.card {
+  border: 1px solid var(--ink);
+  background: var(--surface-raised);
+  padding: 20px;
+}
+.achievement {
+  flex: 1 1 330px;
+}
+.achievementTitle {
+  font-family: var(--font-display-stack);
+  font-weight: 400;
+  font-size: 31px;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+.achievementBody {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* Polaroid */
+.polaroid {
+  flex: 1 1 240px;
+  transform: rotate(-1.4deg);
+  background: #fff;
+  padding: 10px 10px 0;
+  border: 1px solid #cfc7b5;
+  box-shadow: 2px 3px 0 rgba(23, 21, 15, 0.12);
+}
+.polaroidImg {
+  aspect-ratio: 4 / 3;
+  background: repeating-linear-gradient(38deg, #e3ddce 0 7px, #d8d1bf 7px 14px);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 8px;
+}
+.polaroidImg span {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #7d7565;
+}
+.polaroid figcaption {
+  font-family: var(--font-hand-stack);
+  font-size: 19px;
+  padding: 6px 2px 10px;
+  color: var(--ink-soft);
+}
+
+/* Latest article */
+.latest {
+  flex: 2 1 380px;
+  border-left: 3px solid var(--acc);
+  padding: 4px 0 4px 18px;
+}
+.latestTitle {
+  font-family: var(--font-display-stack);
+  font-size: 34px;
+  line-height: 1.08;
+  border: 0;
+  display: block;
+  margin-bottom: 8px;
+}
+.latestExcerpt {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 54ch;
+}
+
+/* Terminal / current project */
+.terminal {
+  flex: 1 1 300px;
+  background: var(--ink);
+  color: #e7e2d6;
+  padding: 18px;
+  font-family: var(--font-mono-stack);
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+.terminalTop {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #3a3529;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a49a86;
+}
+.running {
+  color: #8fbf7a;
+}
+.terminalName {
+  color: #fff;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+.terminalLine {
+  color: #b9b09c;
+}
+.terminalLink {
+  display: inline-block;
+  margin-top: 10px;
+  color: #e8a58f;
+  border-bottom-color: #8a5a4a;
+}
+
+/* Shelf strip */
+.shelf {
+  flex: 1 1 100%;
+}
+.shelfRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.shelfItem {
+  flex: 1 1 140px;
+  max-width: 200px;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.shelfCover {
+  aspect-ratio: 1;
+  border: 1px solid rgba(23, 21, 15, 0.3);
+  box-shadow: 2px 3px 0 rgba(23, 21, 15, 0.12);
+}
+.shelfCat {
+  font-family: var(--font-mono-stack);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--mute);
+}
+.shelfArtist {
+  font-family: var(--font-display-stack);
+  font-size: 17px;
+  line-height: 1.05;
+}
+
+/* Hobbies teaser */
+.hobbies {
+  flex: 1 1 100%;
+}
+.hobbyRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.hobbyChip {
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hobbyChip:hover {
+  border-color: var(--ink);
+}
+.hobbyName {
+  font-family: var(--font-display-stack);
+  font-size: 20px;
+  line-height: 1;
+}
+.hobbyTag {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--mute);
+}
+
+/* Oleg-mode chaos wall */
+.chaos {
+  flex: 1 1 100%;
+}
+.chaosGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.chaosCard {
+  flex: 1 1 200px;
+  max-width: 320px;
+  padding: 14px;
+  border: 1px solid rgba(23, 21, 15, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.chaosTag {
+  font-family: var(--font-mono-stack);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.chaosText {
+  font-size: 15px;
+  line-height: 1.35;
+}
+.tone_paper {
+  background: var(--surface-raised);
+  transform: rotate(-1.2deg);
+}
+.tone_ink {
+  background: #151318;
+  color: #f0ece2;
+  transform: rotate(1.4deg);
+}
+.tone_yellow {
+  background: #fff6b8;
+  transform: rotate(-2deg);
+}
+.tone_sage {
+  background: #dfe7e3;
+  color: #1b2a25;
+  transform: rotate(0.8deg);
+}
+.tone_lilac {
+  background: #efe6f2;
+  color: #2b2130;
+  transform: rotate(-0.6deg);
+}
+.tone_accent {
+  background: var(--acc);
+  color: #fff;
+  transform: rotate(1.8deg);
+}
+
+@media (max-width: 640px) {
+  .latest {
+    flex-basis: 100%;
+  }
+  .chaosCard,
+  .tone_paper,
+  .tone_ink,
+  .tone_yellow,
+  .tone_sage,
+  .tone_lilac,
+  .tone_accent {
+    transform: none;
+  }
+}

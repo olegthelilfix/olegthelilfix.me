@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Caveat:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+:root { --acc: #c0442a; --paper: #f4f1ea; --ink: #17150f; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #e9e5db; color: var(--ink); }
+body { font-family: "Newsreader", Georgia, serif; -webkit-font-smoothing: antialiased; }
+a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--acc); text-underline-offset: 3px; }
+a:hover { color: var(--acc); border-bottom-color: var(--ink); }
+button { font: inherit; cursor: pointer; }
+::selection { background: var(--acc); color: #fff; }
+@keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes tick { from { opacity: .35; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+@media print {
+  body { background: #fff; }
+  [data-noprint] { display: none !important; }
+  [data-cv] { padding: 0 !important; }
+}
+</style>
+</helmet>
+
+<div style="min-height:100vh; background:var(--paper); background-image:radial-gradient(#dcd6c8 1px, transparent 1px); background-size:22px 22px;">
+
+  <div data-noprint="1" style="position:sticky; top:0; z-index:60; background:rgba(244,241,234,.94); backdrop-filter:blur(8px); border-bottom:1px solid var(--ink);">
+    <div style="max-width:1280px; margin:0 auto; padding:9px 16px; display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.13em; text-transform:uppercase;">
+      <a href="#/" style="border:0; font-weight:600; white-space:nowrap;"><span style="color:var(--acc);">※</span> Oleg Aleksandrov</a>
+      <nav style="display:flex; flex-wrap:wrap; gap:4px 14px; align-items:center;">
+        <a href="#/cv" style="border:0; opacity:.75;" style-hover="{{ navHover }}">CV</a>
+        <a href="#/journey" style="border:0; opacity:.75;" style-hover="{{ navHover }}">Journey</a>
+        <a href="#/projects" style="border:0; opacity:.75;" style-hover="{{ navHover }}">Projects</a>
+        <a href="#/articles" style="border:0; opacity:.75;" style-hover="{{ navHover }}">Articles</a>
+        <a href="#/collections" style="border:0; opacity:.75;" style-hover="{{ navHover }}">Collections</a>
+        <a href="#/photos" style="border:0; opacity:.75;" style-hover="{{ navHover }}">Photos</a>
+        <a href="#/hobbies" style="border:0; opacity:.75;" style-hover="{{ navHover }}">Hobbies</a>
+        <a href="#/now" style="border:0; opacity:.75;" style-hover="{{ navHover }}">Now</a>
+        <a href="#/remember" style="border:0; color:var(--acc);" style-hover="{{ navHover }}">Remember</a>
+        <a href="mailto:hello@olegthelilfix.com" style="border:0; opacity:.75;" style-hover="{{ navHover }}">Contact</a>
+      </nav>
+      <button onClick="{{ wander }}" style="margin-left:auto; background:var(--ink); color:var(--paper); border:0; padding:6px 12px; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase;" style-hover="{{ btnHover }}">Take me somewhere ↗</button>
+    </div>
+  </div>
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width:1280px; margin:0 auto; padding:40px 16px 80px;">
+
+    <header style="max-width:640px; margin-bottom:34px;">
+      <h1 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(44px,7vw,78px); line-height:.95; margin:0 0 14px; letter-spacing:-.02em;">Oleg Aleksandrov</h1>
+      <p style="font-size:19px; line-height:1.5; margin:0; max-width:56ch; text-wrap:pretty; color:#3a352a;">Engineering manager, developer, mentor, writer, collector of things and occasional builder of unnecessary systems.</p>
+      <p style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#8a8272; margin:16px 0 0;">Personal archive · olegthelilfix.com · est. somewhere around 2014</p>
+    </header>
+
+    <div data-noprint="1" style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:10px 0 26px; border-top:1px solid var(--ink); border-bottom:1px dashed #b9b1a0; margin-bottom:28px;">
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#8a8272; padding-top:14px;">Density</span>
+      <div style="display:flex; gap:6px; padding-top:14px;">
+        <sc-for list="{{ densityChips }}" as="c" hint-placeholder-count="3">
+          <button onClick="{{ c.fn }}" style="{{ c.style }}">{{ c.label }}</button>
+        </sc-for>
+      </div>
+      <span style="font-family:'Caveat',cursive; font-size:18px; color:var(--acc); padding-top:14px; transform:rotate(-2deg);">{{ densityNote }}</span>
+    </div>
+
+    <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start;">
+
+      <section style="flex:1 1 330px; border:1px solid var(--ink); background:#fffdf7; padding:20px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--acc); margin-bottom:10px;">Selected achievement</div>
+        <div style="font-family:'Instrument Serif',serif; font-size:31px; line-height:1.1; margin-bottom:8px;">{{ hero.title }}</div>
+        <p style="margin:0; font-size:15px; line-height:1.55; color:#433d31;">{{ hero.body }}</p>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#8a8272; margin-top:14px;">{{ hero.year }}</div>
+      </section>
+
+      <sc-if value="{{ notCalm }}" hint-placeholder-val="{{ true }}">
+      <figure style="flex:1 1 240px; margin:0; transform:rotate(-1.4deg);">
+        <div style="background:#fff; padding:10px 10px 0; border:1px solid #cfc7b5; box-shadow:2px 3px 0 rgba(23,21,15,.12);">
+          <div style="aspect-ratio:4/3; background:repeating-linear-gradient(38deg,#e3ddce 0 7px,#d8d1bf 7px 14px); display:grid; place-items:center;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em; color:#7d7565; text-align:center; padding:8px;">photo · first winter<br />in Germany, 2018</span>
+          </div>
+          <figcaption style="font-family:'Caveat',cursive; font-size:19px; padding:6px 2px 10px; color:#3a352a;">no furniture yet, but the kettle worked</figcaption>
+        </div>
+      </figure>
+      </sc-if>
+
+      <section style="flex:2 1 380px; border-left:3px solid var(--acc); padding:4px 0 4px 18px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#8a8272; margin-bottom:8px;">Latest article · {{ latest.kind }}</div>
+        <a href="#/articles" style="font-family:'Instrument Serif',serif; font-size:34px; line-height:1.08; border:0; display:block; margin-bottom:8px;">{{ latest.title }}</a>
+        <p style="margin:0 0 10px; font-size:16px; line-height:1.55; color:#433d31; max-width:54ch; text-wrap:pretty;">{{ latest.excerpt }}</p>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#8a8272;">{{ latest.date }} · {{ latest.read }}</div>
+      </section>
+
+      <section style="flex:1 1 300px; background:var(--ink); color:#e7e2d6; padding:18px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; line-height:1.65;">
+        <div style="display:flex; justify-content:space-between; border-bottom:1px solid #3a3529; padding-bottom:6px; margin-bottom:10px; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#a49a86;">
+          <span>current project</span><span style="color:#8fbf7a;">● running</span>
+        </div>
+        <div style="color:#fff; font-size:15px; margin-bottom:6px;">{{ current.name }}</div>
+        <div style="color:#b9b09c;">{{ current.line1 }}</div>
+        <div style="color:#b9b09c;">{{ current.line2 }}</div>
+        <div style="margin-top:10px;"><a href="#/projects" style="color:#e8a58f; border-bottom-color:#8a5a4a;">open the lab →</a></div>
+      </section>
+
+      <sc-if value="{{ notCalm }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1 1 100%; display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start;">
+      <section style="flex:1 1 260px; transform:rotate(1.2deg);">
+        <div style="background:#fbf7ec; border:1px solid #cfc7b5; padding:14px; box-shadow:3px 3px 0 rgba(23,21,15,.1);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px dashed #c8c0ae; padding-bottom:8px; margin-bottom:8px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#8a8272;">Postcard</span>
+            <span style="border:1px solid var(--acc); color:var(--acc); font-family:'IBM Plex Mono',monospace; font-size:9px; padding:2px 5px; transform:rotate(6deg);">TRIESTE</span>
+          </div>
+          <p style="font-family:'Caveat',cursive; font-size:21px; line-height:1.3; margin:0; color:#2a2620;">Wind, coffee, a harbour that smells like metal. Bought a record I can’t play here.</p>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8a8272; margin-top:10px;">04.09.2023 → <a href="#/postcards" style="border-bottom-color:#c8c0ae;">all 46 postcards</a></div>
+        </div>
+      </section>
+
+      <section style="flex:3 1 520px; border:1px solid var(--ink); padding:16px; background:#f1ede2;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase;">
+          <span>From the shelf</span><a href="#/vinyl" style="border-bottom-color:var(--acc);">214 records →</a>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:12px;">
+          <sc-for list="{{ homeVinyl }}" as="r" hint-placeholder-count="4">
+            <a href="#/vinyl" style="flex:1 1 110px; max-width:150px; border:0; display:block;">
+              <div style="aspect-ratio:1; border:1px solid #b9b1a0; position:relative;">
+                <div style="{{ r.coverStyle }}"></div>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.06em; color:#6d6555; margin-top:5px; line-height:1.35;">{{ r.artist }}<br /><span style="color:#a29a88;">{{ r.cat }}</span></div>
+            </a>
+          </sc-for>
+        </div>
+      </section>
+
+      <aside style="flex:1 1 220px; background:#fff6b8; padding:16px; transform:rotate(-1.8deg); box-shadow:2px 3px 0 rgba(23,21,15,.12);">
+        <p style="font-family:'Caveat',cursive; font-size:23px; line-height:1.25; margin:0; color:#33301f;">Note to self: the boring maintenance week was the reason the good week happened.</p>
+      </aside>
+      </div>
+      </sc-if>
+
+      <section style="flex:1 1 230px; border-top:2px solid var(--ink); padding-top:10px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#8a8272; margin-bottom:6px;">Fact from the CV</div>
+        <p style="margin:0; font-size:16.5px; line-height:1.5;">Backend developer → tech lead → engineering manager. Six people, two teams, one very long migration.</p>
+        <div style="margin-top:10px;"><a href="#/cv" style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em;">the serious page →</a></div>
+      </section>
+
+      <sc-if value="{{ notCalm }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1 1 100%; display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start;">
+      <section style="flex:1 1 230px; background:#dfe7e3; padding:16px; border:1px solid #a9b7b0;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#4c5c55; margin-bottom:8px;">Hobby, currently active</div>
+        <div style="font-family:'Instrument Serif',serif; font-size:29px; line-height:1.05; margin-bottom:6px;">Drums, month 7</div>
+        <p style="margin:0; font-size:15px; line-height:1.5; color:#33403a;">Still counting out loud. The neighbours have been generous.</p>
+        <div style="margin-top:10px;"><a href="#/hobbies" style="font-family:'IBM Plex Mono',monospace; font-size:11px;">all hobbies →</a></div>
+      </section>
+
+      <section style="flex:1 1 250px; padding:14px 0; border-top:1px solid #b9b1a0; border-bottom:1px solid #b9b1a0;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--acc); margin-bottom:6px;">From the past</div>
+        <p style="margin:0; font-size:16px; line-height:1.5;">2019 — first 100 km on a bicycle. Took nine hours, three wrong turns and one bakery.</p>
+        <div style="margin-top:8px;"><a href="#/journey" style="font-family:'IBM Plex Mono',monospace; font-size:11px;">the whole journey →</a></div>
+      </section>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isCalm }}" hint-placeholder-val="{{ false }}">
+      <nav style="flex:1 1 100%; padding:26px 0 10px; border-top:1px solid #cfc7b5; display:flex; flex-wrap:wrap; gap:10px 30px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:.06em;">
+        <a href="#/cv">CV</a><a href="#/journey">Journey</a><a href="#/projects">Projects</a><a href="#/articles">Articles</a><a href="#/collections">Collections</a><a href="#/photos">Photos</a><a href="#/hobbies">Hobbies</a><a href="#/now">Now</a><a href="#/remember" style="color:var(--acc);">Remember</a><a href="mailto:hello@olegthelilfix.com">Contact</a>
+      </nav>
+      </sc-if>
+
+      <sc-if value="{{ notCalm }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1 1 100%; display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start;">
+        <section style="flex:1 1 280px; border:1px dashed var(--ink); padding:16px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#8a8272; margin-bottom:8px;">Unfinished, kept anyway</div>
+          <ul style="margin:0; padding-left:18px; font-size:15.5px; line-height:1.7; color:#433d31;">
+            <li>A postcard-scanning tool that scanned four postcards.</li>
+            <li>A novel with a very good first chapter.</li>
+            <li>A home server rack made of two shelves and hope.</li>
+          </ul>
+        </section>
+        <section style="flex:1 1 220px; background:#fffdf7; border:1px solid var(--ink); padding:16px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#8a8272; margin-bottom:10px;">Counters</div>
+          <div style="display:flex; flex-wrap:wrap; gap:14px 22px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:#433d31;">
+            <div><div style="font-family:'Instrument Serif',serif; font-size:30px; color:var(--acc);">11 240</div>km cycled</div>
+            <div><div style="font-family:'Instrument Serif',serif; font-size:30px; color:var(--acc);">214</div>records</div>
+            <div><div style="font-family:'Instrument Serif',serif; font-size:30px; color:var(--acc);">9</div>interns mentored</div>
+            <div><div style="font-family:'Instrument Serif',serif; font-size:30px; color:var(--acc);">B2</div>Deutsch, finally</div>
+          </div>
+        </section>
+        <a href="#/remember" style="flex:1 1 260px; border:0; display:block; background:#efe6f2; padding:18px; border:1px solid #bfaec6;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#6b5a72; margin-bottom:8px;">For a heavy day</div>
+          <div style="font-family:'Instrument Serif',serif; font-size:27px; line-height:1.12;">You have been here before. You kept going.</div>
+        </a>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isOleg }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1 1 100%; position:relative; display:flex; flex-wrap:wrap; gap:14px; align-items:flex-start; padding-top:8px;">
+        <div style="flex:1 1 100%; background:var(--acc); color:#fff; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.22em; text-transform:uppercase; padding:7px 12px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">everything below this line is optional · nothing below this line is optional · ※ · everything below this line is optional</div>
+        <sc-for list="{{ chaosCards }}" as="k" hint-placeholder-count="8">
+          <a href="{{ k.href }}" style="{{ k.style }}">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; opacity:.7; display:block; margin-bottom:6px;">{{ k.tag }}</span>
+            <span style="font-size:16px; line-height:1.35; display:block;">{{ k.text }}</span>
+          </a>
+        </sc-for>
+        <div style="flex:1 1 100%; display:flex; flex-wrap:wrap; gap:8px; font-family:'Caveat',cursive; font-size:20px; color:#5b5347;">
+          <span style="transform:rotate(-2deg);">↖ this one matters</span>
+          <span style="transform:rotate(1deg);">(sorry about the noise)</span>
+          <span style="transform:rotate(-1deg);">the calm switch is up there ↑</span>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ notCalm }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1 1 100%; display:flex; justify-content:center; padding:34px 0 0;">
+        <button onClick="{{ wander }}" style="background:none; border:2px solid var(--ink); padding:18px 30px; font-family:'Instrument Serif',serif; font-size:27px;" style-hover="{{ bigBtnHover }}">Take me somewhere <span style="color:var(--acc);">↗</span></button>
+      </div>
+      </sc-if>
+
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isCv }}" hint-placeholder-val="{{ false }}">
+  <main data-cv="1" style="max-width:880px; margin:0 auto; padding:56px 16px 90px; background:#fff; border-left:1px solid #e2ddd0; border-right:1px solid #e2ddd0;">
+    <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:flex-end; justify-content:space-between; border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:30px;">
+      <div>
+        <h1 style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:26px; letter-spacing:-.01em; margin:0 0 6px;">Oleg Aleksandrov</h1>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:#5b5347;">Engineering Manager · Backend Developer · Germany</div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; line-height:1.9; text-align:right;">
+        <div><a href="#/">olegthelilfix.com</a></div>
+        <div>hello@olegthelilfix.com</div>
+        <div data-noprint="1"><a href="#/cv">Download PDF ↓</a></div>
+      </div>
+    </div>
+
+    <section style="margin-bottom:30px;">
+      <p style="margin:0; font-size:16.5px; line-height:1.65; max-width:70ch; text-wrap:pretty;">Backend engineer turned engineering manager. Eleven years building and operating JVM services (Kotlin, Java, Spring, PostgreSQL, Kafka); the last four leading teams. I care about systems that stay understandable at 3 a.m., about people who grow faster than their job titles, and about writing things down before they are forgotten.</p>
+    </section>
+
+    <sc-for list="{{ cvSections }}" as="s" hint-placeholder-count="6">
+      <section style="display:flex; flex-wrap:wrap; gap:8px 28px; border-top:1px solid #ddd7c9; padding:18px 0;">
+        <h2 style="flex:0 0 150px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8a8272; margin:0; padding-top:3px;">{{ s.title }}</h2>
+        <div style="flex:1 1 420px;">
+          <sc-for list="{{ s.rows }}" as="r" hint-placeholder-count="3">
+            <div style="margin-bottom:16px;">
+              <div style="display:flex; flex-wrap:wrap; gap:4px 14px; align-items:baseline;">
+                <span style="font-size:17px; font-weight:500;">{{ r.head }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#8a8272; margin-left:auto;">{{ r.meta }}</span>
+              </div>
+              <p style="margin:5px 0 0; font-size:15.5px; line-height:1.6; color:#3f392e; max-width:64ch;">{{ r.body }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </sc-for>
+
+    <div style="border-top:2px solid var(--ink); margin-top:12px; padding-top:14px; display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:flex-start;">
+      <p style="margin:0; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em; color:#8a8272; max-width:52ch; line-height:1.7;">※ Footnote, kept against the advice of everyone: 11 240 km cycled since 2019, 214 records on the shelf, 46 postcards, one OCR pipeline abandoned in a state of dignity, and month 7 of learning the drums.</p>
+      <span style="font-family:'Caveat',cursive; font-size:19px; color:var(--acc); transform:rotate(-3deg);">the rest of me → <a href="#/journey" style="border-bottom-color:var(--acc);">/journey</a></span>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isJourney }}" hint-placeholder-val="{{ false }}">
+  <main style="padding:44px 16px 90px; max-width:1280px; margin:0 auto;">
+    <header style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end; justify-content:space-between; margin-bottom:22px;">
+      <div>
+        <h1 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(40px,6vw,66px); margin:0 0 6px; line-height:1;">Journey</h1>
+        <p style="margin:0; font-size:17px; color:#5b5347; max-width:52ch;">A wall of things that happened. Sizes are honest: the big cards mattered more, the small notes mattered quietly.</p>
+      </div>
+      <div data-noprint="1" style="display:flex; flex-wrap:wrap; gap:6px;">
+        <sc-for list="{{ journeyChips }}" as="c" hint-placeholder-count="5">
+          <button onClick="{{ c.fn }}" style="{{ c.style }}">{{ c.label }}</button>
+        </sc-for>
+      </div>
+    </header>
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:#8a8272; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); padding:6px 0; margin-bottom:20px;">2014 ————— 2026 · {{ journeyCount }} entries shown</div>
+    <div style="columns:300px; column-gap:18px;">
+      <sc-for list="{{ journeyItems }}" as="e" hint-placeholder-count="9">
+        <div style="{{ e.wrapStyle }}">
+          <div style="{{ e.cardStyle }}">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--acc); margin-bottom:6px;">{{ e.year }} · {{ e.cat }}</div>
+            <div style="{{ e.titleStyle }}">{{ e.title }}</div>
+            <p style="margin:6px 0 0; font-size:15px; line-height:1.55; color:#433d31;">{{ e.body }}</p>
+            <sc-if value="{{ e.hasNote }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family:'Caveat',cursive; font-size:19px; color:#6b6252; margin-top:8px;">{{ e.note }}</div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isRemember }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:720px; margin:0 auto; padding:80px 20px 120px;">
+    <h1 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(34px,5.2vw,50px); line-height:1.12; margin:0 0 14px; text-wrap:pretty;">You have been here before. You kept going.</h1>
+    <p style="font-size:17px; line-height:1.6; color:#5b5347; margin:0 0 46px; max-width:50ch;">No advice on this page. Only evidence — things that actually happened, kept here for the days when they are hard to remember.</p>
+
+    <div style="border:1px solid #cfc7b5; background:#fffdf7; padding:28px; box-shadow:0 1px 0 rgba(23,21,15,.08); animation:riseIn .5s ease both;" key="{{ memKey }}">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#8a8272; margin-bottom:14px;">{{ memory.kind }}</div>
+      <div style="font-family:'Instrument Serif',serif; font-size:clamp(26px,4vw,36px); line-height:1.15; margin-bottom:12px;">{{ memory.title }}</div>
+      <p style="margin:0 0 16px; font-size:17px; line-height:1.62; color:#3f392e; text-wrap:pretty;">{{ memory.body }}</p>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#8a8272; border-top:1px dashed #cfc7b5; padding-top:12px;">{{ memory.stamp }}</div>
+    </div>
+
+    <div data-noprint="1" style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:26px;">
+      <button onClick="{{ nextMemory }}" style="background:none; border:1px solid var(--ink); padding:12px 20px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.12em; text-transform:uppercase;" style-hover="{{ btnHover }}">Show me another memory</button>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#a29a88;">{{ memProgress }}</span>
+    </div>
+
+    <p style="font-family:'Caveat',cursive; font-size:21px; color:#6b6252; margin-top:56px; max-width:34ch; line-height:1.4;">If today is only maintenance, that is still the job. — you, 2022</p>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isArticles }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:1080px; margin:0 auto; padding:44px 16px 90px;">
+    <header style="border-bottom:3px double var(--ink); padding-bottom:14px; margin-bottom:8px;">
+      <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:baseline; justify-content:space-between;">
+        <h1 style="font-family:'Instrument Serif',serif; font-style:italic; font-weight:400; font-size:clamp(40px,6.5vw,72px); margin:0; line-height:1;">Articles</h1>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:#8a8272;">Issue №14 · irregular · free</span>
+      </div>
+    </header>
+    <div data-noprint="1" style="display:flex; flex-wrap:wrap; gap:6px; padding:12px 0 22px; border-bottom:1px solid var(--ink); margin-bottom:26px;">
+      <sc-for list="{{ articleChips }}" as="c" hint-placeholder-count="6">
+        <button onClick="{{ c.fn }}" style="{{ c.style }}">{{ c.label }}</button>
+      </sc-for>
+    </div>
+    <div style="columns:330px; column-gap:34px;">
+      <sc-for list="{{ articleItems }}" as="a" hint-placeholder-count="8">
+        <article style="break-inside:avoid; margin-bottom:30px; padding-bottom:26px; border-bottom:1px solid #d6d0c1;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--acc); margin-bottom:7px;">{{ a.kind }} · {{ a.date }}</div>
+          <h2 style="{{ a.titleStyle }}">{{ a.title }}</h2>
+          <p style="margin:8px 0 0; font-size:15.5px; line-height:1.6; color:#433d31; text-wrap:pretty;">{{ a.excerpt }}</p>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#8a8272; margin-top:10px;">{{ a.read }} · {{ a.tags }}</div>
+        </article>
+      </sc-for>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isProjects }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:1180px; margin:0 auto; padding:44px 16px 90px;">
+    <header style="display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:flex-end; border:1px solid var(--ink); padding:14px 16px; background:#eef0ea; margin-bottom:22px;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#6d7568;">Institute of unnecessary systems · workshop log</div>
+        <h1 style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:clamp(26px,4vw,38px); margin:6px 0 0; letter-spacing:-.02em;">Projects</h1>
+      </div>
+      <p style="margin:0; font-size:15px; max-width:44ch; color:#454b43;">Finished, half-finished and honourably abandoned. The abandoned ones taught the most, which is annoying.</p>
+    </header>
+    <div data-noprint="1" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:22px;">
+      <sc-for list="{{ projectChips }}" as="c" hint-placeholder-count="5">
+        <button onClick="{{ c.fn }}" style="{{ c.style }}">{{ c.label }}</button>
+      </sc-for>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:16px;">
+      <sc-for list="{{ projectItems }}" as="p" hint-placeholder-count="6">
+        <article style="flex:1 1 330px; border:1px solid var(--ink); background:#fbfaf5; display:flex; flex-direction:column;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 12px; border-bottom:1px solid var(--ink); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase;">
+            <span style="color:#8a8272;">{{ p.code }}</span>
+            <span style="{{ p.statusStyle }}">{{ p.status }}</span>
+          </div>
+          <div style="height:96px; border-bottom:1px solid #d6d0c1;">
+            <div style="{{ p.diagramStyle }}"></div>
+          </div>
+          <div style="padding:14px; display:flex; flex-direction:column; gap:8px; flex:1;">
+            <h2 style="font-family:'IBM Plex Mono',monospace; font-size:16px; font-weight:600; margin:0;">{{ p.name }}</h2>
+            <p style="margin:0; font-size:15px; line-height:1.55; color:#433d31;">{{ p.desc }}</p>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#6d6555; line-height:1.7;">{{ p.period }}<br />{{ p.tech }}</div>
+            <div style="border-top:1px dashed #cfc7b5; padding-top:8px; font-size:14.5px; line-height:1.5; color:#3f392e;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--acc);">Learned</span><br />{{ p.learned }}</div>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isCollections }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:1180px; margin:0 auto; padding:44px 16px 90px;">
+    <h1 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(40px,6vw,66px); margin:0 0 8px; line-height:1;">Cabinet of collections</h1>
+    <p style="font-size:17px; color:#5b5347; margin:0 0 30px; max-width:56ch;">Seven drawers. Two of them are properly catalogued, which is two more than expected.</p>
+    <div style="display:flex; flex-wrap:wrap; gap:14px;">
+      <sc-for list="{{ drawers }}" as="d" hint-placeholder-count="7">
+        <a href="{{ d.href }}" style="{{ d.style }}">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; opacity:.65;">{{ d.code }}</span>
+          <span style="font-family:'Instrument Serif',serif; font-size:32px; line-height:1;">{{ d.name }}</span>
+          <span style="font-size:14.5px; line-height:1.45;">{{ d.note }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; opacity:.7;">{{ d.count }}</span>
+        </a>
+      </sc-for>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isVinyl }}" hint-placeholder-val="{{ false }}">
+  <main style="background:#151318; color:#f0ece2; padding:44px 16px 90px;">
+    <div style="max-width:1240px; margin:0 auto;">
+      <header style="display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; justify-content:space-between; border-bottom:1px solid #3a3542; padding-bottom:16px; margin-bottom:8px;">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:#8f8798;">/collections/vinyl</div>
+          <h1 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(46px,9vw,104px); line-height:.86; margin:6px 0 0; color:#fff;">The <span style="font-style:italic; color:#ff6a45;">shelf</span></h1>
+        </div>
+        <p style="margin:0; max-width:40ch; font-size:15.5px; line-height:1.55; color:#bdb5c2;">214 records, sorted by a system only I understand. Hover a sleeve for the catalogue entry; click for the story.</p>
+      </header>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#6f6878; padding:10px 0 22px;">A—Z ignored · condition mostly VG+ · one sleeve smells of a Lisbon basement</div>
+      <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start;">
+        <sc-for list="{{ records }}" as="r" hint-placeholder-count="12">
+          <button onClick="{{ r.open }}" style="{{ r.tileStyle }}">
+            <span style="display:block; aspect-ratio:1; border:1px solid #3a3542; position:relative; overflow:hidden;">
+              <span style="{{ r.coverStyle }}"></span>
+              <span style="position:absolute; left:6px; bottom:6px; font-family:'IBM Plex Mono',monospace; font-size:8.5px; letter-spacing:.1em; color:#fff; background:rgba(0,0,0,.55); padding:2px 5px;">{{ r.cat }}</span>
+            </span>
+            <span style="display:block; text-align:left; margin-top:7px; font-family:'IBM Plex Mono',monospace; font-size:10px; line-height:1.45; color:#cfc7d4;">{{ r.artist }}<br /><span style="color:#8f8798;">{{ r.title }} · {{ r.year }}</span></span>
+          </button>
+        </sc-for>
+        <div style="flex:1 1 220px; border:1px dashed #4a4454; padding:16px; font-family:'Caveat',cursive; font-size:22px; color:#ffb59e; line-height:1.3;">…and 202 more, still in the crate by the door.</div>
+      </div>
+    </div>
+    <sc-if value="{{ recOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeRec }}" style="position:fixed; inset:0; background:rgba(12,10,14,.82); z-index:80; display:flex; align-items:center; justify-content:center; padding:18px; animation:tick .18s ease both;">
+        <div onClick="{{ stop }}" style="background:#faf7f0; color:var(--ink); max-width:660px; width:100%; max-height:88vh; overflow:auto; padding:24px; border:1px solid #000; animation:riseIn .28s ease both;">
+          <div style="display:flex; flex-wrap:wrap; gap:18px;">
+            <div style="flex:0 0 160px; aspect-ratio:1; border:1px solid #b9b1a0;"><div style="{{ rec.coverStyle }}"></div></div>
+            <div style="flex:1 1 240px;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--acc);">{{ rec.cat }} · {{ rec.edition }}</div>
+              <div style="font-family:'Instrument Serif',serif; font-size:34px; line-height:1.05; margin:6px 0 2px;">{{ rec.title }}</div>
+              <div style="font-size:17px; color:#5b5347;">{{ rec.artist }} · {{ rec.year }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; line-height:1.9; margin-top:12px; color:#433d31;">Bought {{ rec.bought }}<br />Favourite track — {{ rec.fav }}</div>
+            </div>
+          </div>
+          <p style="margin:18px 0 0; font-size:16.5px; line-height:1.6; border-top:1px dashed #cfc7b5; padding-top:14px; text-wrap:pretty;">{{ rec.note }}</p>
+          <button onClick="{{ closeRec }}" style="margin-top:18px; background:var(--ink); color:var(--paper); border:0; padding:9px 16px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;">Back to the shelf</button>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isPostcards }}" hint-placeholder-val="{{ false }}">
+  <main style="padding:40px 16px 90px; max-width:1240px; margin:0 auto;">
+    <header style="display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; justify-content:space-between; margin-bottom:18px;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#8a8272;">/collections/postcards</div>
+        <h1 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(40px,6vw,66px); margin:6px 0 0; line-height:1;">Postcards</h1>
+        <p style="margin:8px 0 0; font-size:16px; color:#5b5347; max-width:48ch;">Mostly written to myself, because posting them felt like an unnecessary risk. Click a card to turn it over.</p>
+      </div>
+      <div data-noprint="1" style="display:flex; gap:6px;">
+        <sc-for list="{{ pcChips }}" as="c" hint-placeholder-count="3">
+          <button onClick="{{ c.fn }}" style="{{ c.style }}">{{ c.label }}</button>
+        </sc-for>
+      </div>
+    </header>
+
+    <sc-if value="{{ pcDesk }}" hint-placeholder-val="{{ true }}">
+      <div style="overflow-x:auto; border:1px solid #cfc7b5; background:#e8e0cf; background-image:repeating-linear-gradient(90deg,rgba(0,0,0,.03) 0 1px,transparent 1px 60px);">
+        <div style="position:relative; min-width:940px; height:620px;">
+          <sc-for list="{{ postcards }}" as="p" hint-placeholder-count="8">
+            <div style="{{ p.deskStyle }}">
+              <button onClick="{{ p.flip }}" style="{{ p.faceStyle }}">
+                <sc-if value="{{ p.isFront }}" hint-placeholder-val="{{ true }}">
+                  <span style="{{ p.artStyle }}"></span>
+                  <span style="position:absolute; left:0; right:0; bottom:0; background:rgba(250,247,240,.94); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; padding:5px 8px; text-align:left;">{{ p.city }} · {{ p.year }}</span>
+                </sc-if>
+                <sc-if value="{{ p.isBack }}" hint-placeholder-val="{{ false }}">
+                  <span style="display:block; height:100%; background:#fdfaf2; padding:12px; text-align:left; position:relative;">
+                    <span style="position:absolute; right:10px; top:10px; width:52px; height:40px; border:1px solid #b9b1a0; background:repeating-linear-gradient(45deg,#e6dfcd 0 4px,#dcd4c0 4px 8px);"></span>
+                    <span style="position:absolute; right:6px; top:6px; width:60px; height:48px; border:1.5px solid var(--acc); border-radius:50%; opacity:.45;"></span>
+                    <span style="display:block; font-family:'Caveat',cursive; font-size:19px; line-height:1.25; color:#2a2620; max-width:62%;">{{ p.text }}</span>
+                    <span style="position:absolute; left:12px; bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.12em; color:#8a8272;">{{ p.date }} · {{ p.country }}</span>
+                  </span>
+                </sc-if>
+              </button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <p style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#8a8272; margin-top:10px;">Desk view scrolls sideways on narrow screens — the pile is wider than a phone.</p>
+    </sc-if>
+
+    <sc-if value="{{ pcArchive }}" hint-placeholder-val="{{ false }}">
+      <div style="border-top:1px solid var(--ink);">
+        <sc-for list="{{ postcards }}" as="p" hint-placeholder-count="8">
+          <div style="display:flex; flex-wrap:wrap; gap:6px 20px; align-items:baseline; border-bottom:1px solid #ddd7c9; padding:12px 4px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#8a8272; flex:0 0 92px;">{{ p.ref }}</span>
+            <span style="font-family:'Instrument Serif',serif; font-size:24px; flex:0 0 auto;">{{ p.city }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#8a8272;">{{ p.country }} · {{ p.date }}</span>
+            <span style="flex:1 1 260px; font-size:15px; color:#433d31;">{{ p.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pcMap }}" hint-placeholder-val="{{ false }}">
+      <div style="position:relative; height:560px; border:1px solid var(--ink); background:#eef1ee; background-image:linear-gradient(rgba(0,0,0,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.045) 1px,transparent 1px); background-size:44px 44px;">
+        <span style="position:absolute; left:10px; top:8px; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#7d8580;">Approximate. Not to scale. Europe, roughly.</span>
+        <sc-for list="{{ postcards }}" as="p" hint-placeholder-count="8">
+          <div style="{{ p.mapStyle }}">
+            <span style="display:block; width:9px; height:9px; background:var(--acc); border-radius:50%;"></span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; white-space:nowrap;">{{ p.city }} <span style="color:#8a8272;">{{ p.year }}</span></span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isPhotos }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:1180px; margin:0 auto; padding:44px 16px 90px;">
+    <h1 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(40px,6vw,66px); margin:0 0 6px; line-height:1;">Photos</h1>
+    <p style="font-size:16.5px; color:#5b5347; margin:0 0 28px; max-width:54ch;">Not a feed. A contact sheet, a few enlargements, and the captions that make them worth keeping.</p>
+    <div style="display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;">
+      <figure style="flex:2 1 420px; margin:0;">
+        <div style="aspect-ratio:3/2; background:repeating-linear-gradient(28deg,#ded7c6 0 9px,#d3cbb8 9px 18px); display:grid; place-items:center; border:1px solid #b9b1a0;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.12em; color:#7d7565;">photo · elbe, 6:40 in the morning</span>
+        </div>
+        <figcaption style="font-size:15.5px; line-height:1.5; margin-top:8px; color:#433d31;">Hamburg, May 2024. 140 km day. I remember being certain, for about four minutes, that everything was fine.</figcaption>
+      </figure>
+      <div style="flex:1 1 280px; background:#1c1a16; padding:12px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:#a49a86; margin-bottom:8px;">Contact sheet 07 · 2023—2025</div>
+        <div style="display:flex; flex-wrap:wrap; gap:5px;">
+          <sc-for list="{{ frames }}" as="f" hint-placeholder-count="12">
+            <div style="{{ f.style }}"></div>
+          </sc-for>
+        </div>
+        <div style="font-family:'Caveat',cursive; font-size:18px; color:#d8cdb8; margin-top:10px;">frames 4 and 9 are the only good ones</div>
+      </div>
+      <sc-for list="{{ photoCards }}" as="p" hint-placeholder-count="4">
+        <figure style="flex:1 1 250px; margin:0; background:#fff; border:1px solid #cfc7b5; padding:9px 9px 0;">
+          <div style="{{ p.imgStyle }}"></div>
+          <figcaption style="padding:8px 2px 12px; font-size:14.5px; line-height:1.45; color:#433d31;">{{ p.caption }}<div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8a8272; margin-top:5px;">{{ p.meta }}</div></figcaption>
+        </figure>
+      </sc-for>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isHobbies }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:1180px; margin:0 auto; padding:44px 16px 90px;">
+    <h1 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(40px,6vw,66px); margin:0 0 26px; line-height:1;">Hobbies</h1>
+    <div style="display:flex; flex-wrap:wrap; gap:16px;">
+      <sc-for list="{{ hobbies }}" as="h" hint-placeholder-count="6">
+        <a href="{{ h.href }}" style="{{ h.style }}">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.18em; text-transform:uppercase; opacity:.7;">{{ h.tag }}</span>
+          <span style="{{ h.titleStyle }}">{{ h.name }}</span>
+          <span style="font-size:15px; line-height:1.5;">{{ h.body }}</span>
+        </a>
+      </sc-for>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isNow }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:760px; margin:0 auto; padding:56px 20px 100px;">
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:#8a8272;">Journal entry · updated 12 July 2026</div>
+    <h1 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(38px,5.6vw,58px); margin:8px 0 22px; line-height:1.02;">What I am doing now</h1>
+    <sc-for list="{{ nowEntries }}" as="n" hint-placeholder-count="6">
+      <section style="display:flex; flex-wrap:wrap; gap:6px 22px; border-top:1px solid #ddd7c9; padding:16px 0;">
+        <h2 style="flex:0 0 120px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--acc); margin:0; padding-top:4px;">{{ n.label }}</h2>
+        <p style="flex:1 1 340px; margin:0; font-size:17px; line-height:1.6; color:#3f392e; text-wrap:pretty;">{{ n.text }}</p>
+      </section>
+    </sc-for>
+    <p style="font-family:'Caveat',cursive; font-size:21px; color:#6b6252; margin-top:34px;">Next thing I want to try: recording the drums badly and keeping the take.</p>
+  </main>
+  </sc-if>
+
+  <footer data-noprint="1" style="border-top:1px solid var(--ink); background:#efebe0; margin-top:0;">
+    <div style="max-width:1280px; margin:0 auto; padding:26px 16px 40px; display:flex; flex-wrap:wrap; gap:18px; justify-content:space-between; align-items:flex-end; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.06em; color:#6d6555;">
+      <div style="line-height:1.9;">
+        <div style="font-size:13px; color:var(--ink);"><span style="color:var(--acc);">※</span> Oleg Aleksandrov</div>
+        <div>olegthelilfix.com · hello@olegthelilfix.com</div>
+        <div>Hand-built. No cookies, no tracking, no newsletter.</div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px 18px;">
+        <a href="#/">Home</a><a href="#/cv">CV</a><a href="#/journey">Journey</a><a href="#/remember">Remember</a><a href="#/collections">Collections</a><a href="#/now">Now</a>
+      </div>
+      <button onClick="{{ wander }}" style="background:none; border:1px solid var(--ink); padding:8px 14px; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase;" style-hover="{{ btnHover }}">Show me something random</button>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#c0442a&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#c0442a&quot;,&quot;#1f6f5c&quot;,&quot;#2f4a8a&quot;,&quot;#8a3a6a&quot;],&quot;section&quot;:&quot;Anchors&quot;},&quot;defaultDensity&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;normal&quot;,&quot;options&quot;:[&quot;calm&quot;,&quot;normal&quot;,&quot;oleg&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Home&quot;}}">
+class Component extends DCLogic {
+  state = { route: 'home', density: 'normal', jf: 'everything', af: 'all', pf: 'all', pcv: 'desk', flipped: {}, mem: 0, rec: null };
+
+  componentDidMount() {
+    this.onHash = () => { this.sync(); window.scrollTo(0, 0); };
+    window.addEventListener('hashchange', this.onHash);
+    this.sync();
+    document.documentElement.style.setProperty('--acc', this.props.accent || '#c0442a');
+    if (this.props.defaultDensity) this.setState({ density: this.props.defaultDensity });
+  }
+  componentDidUpdate(prev) {
+    if (prev.accent !== this.props.accent) document.documentElement.style.setProperty('--acc', this.props.accent || '#c0442a');
+  }
+  componentWillUnmount() { window.removeEventListener('hashchange', this.onHash); }
+
+  sync() {
+    let h = String(window.location.hash || '').replace(/^#\/?/, '').replace(/\/$/, '').toLowerCase();
+    h = h.replace('collections/', '');
+    this.setState({ route: h || 'home', rec: null });
+  }
+
+  routes = ['', 'cv', 'journey', 'remember', 'articles', 'projects', 'collections', 'collections/vinyl', 'collections/postcards', 'photos', 'hobbies', 'now'];
+
+  wander = () => {
+    const pool = this.routes.filter(r => (r || 'home') !== this.state.route);
+    const next = pool[Math.floor(Math.random() * pool.length)];
+    window.location.hash = '#/' + next;
+    if ((next || 'home') === this.state.route) this.sync();
+  };
+
+  chip(active) {
+    return active
+      ? { background: '#17150f', color: '#f4f1ea', border: '1px solid #17150f', padding: '6px 12px', fontFamily: "'IBM Plex Mono',monospace", fontSize: '10.5px', letterSpacing: '.12em', textTransform: 'uppercase' }
+      : { background: 'transparent', color: '#5b5347', border: '1px solid #b9b1a0', padding: '6px 12px', fontFamily: "'IBM Plex Mono',monospace", fontSize: '10.5px', letterSpacing: '.12em', textTransform: 'uppercase' };
+  }
+  darkChip(active) {
+    const s = this.chip(active);
+    return active ? Object.assign({}, s, { background: '#ff6a45', borderColor: '#ff6a45', color: '#151318' }) : s;
+  }
+  chips(list, cur, key) {
+    return list.map(x => ({ label: x[1], style: this.chip(x[0] === cur), fn: () => this.setState({ [key]: x[0] }) }));
+  }
+
+  d = {
+    vinyl: [
+      { artist: 'Talk Talk', title: 'Laughing Stock', year: 1991, cat: 'LS-001', edition: 'EU reissue, 2016', bought: 'Berlin, March 2019', fav: 'After the Flood', note: 'Bought on a day I had nothing planned, which almost never happens. Side two is the reason I started paying attention to silence in music — and, eventually, to silence in meetings.', c1: '#2b3a4a', c2: '#8fa6b8' },
+      { artist: 'Portishead', title: 'Dummy', year: 1994, cat: 'LS-014', edition: 'Original press', bought: 'Flea market, 2020', fav: 'Roads', note: 'Sleeve has a coffee ring that was already there. I decided it belonged to a previous owner with better stories than mine.', c1: '#1e1c22', c2: '#6b5f70' },
+      { artist: 'Miles Davis', title: 'In a Silent Way', year: 1969, cat: 'LS-027', edition: 'Mono repress', bought: 'Hamburg, 2021', fav: 'Shhh / Peaceful', note: 'The record I put on when a deploy is running and I have decided not to watch the logs.', c1: '#4a3b2a', c2: '#c9a26a' },
+      { artist: 'Boards of Canada', title: 'Music Has the Right…', year: 1998, cat: 'LS-031', edition: '2013 reissue', bought: 'Online, regretted the shipping', fav: 'Roygbiv', note: 'Sounds like a childhood I did not have, in a country I have not been to. Excellent for writing.', c1: '#3f5240', c2: '#a8bf8f' },
+      { artist: 'Nina Simone', title: 'Pastel Blues', year: 1965, cat: 'LS-042', edition: 'German press', bought: 'Trieste, 2023', fav: 'Sinnerman', note: 'Carried it in hand luggage across two borders. Worth it.', c1: '#5a2230', c2: '#d09a86' },
+      { artist: 'Kraftwerk', title: 'Trans-Europe Express', year: 1977, cat: 'LS-055', edition: 'EMI, 1977', bought: 'Cologne, 2022', fav: 'Franz Schubert', note: 'A German record bought in Germany by someone still practising his articles. Der, die, das — Trans-Europa Express.', c1: '#2a2a2e', c2: '#c53a2a' },
+      { artist: 'Godspeed You! B.E.', title: 'Lift Your Skinny Fists', year: 2000, cat: 'LS-061', edition: 'Double LP', bought: 'Gift, 2018', fav: 'Storm', note: 'Given to me the winter I moved. Four sides is exactly one evening of unpacking boxes.', c1: '#33302b', c2: '#8a8272' },
+      { artist: 'Fela Kuti', title: 'Zombie', year: 1976, cat: 'LS-078', edition: 'Knitting Factory reissue', bought: 'Utrecht, 2024', fav: 'Zombie', note: 'Twelve minutes per side and not one of them wasted. I have tried to write software like this.', c1: '#2f4a2a', c2: '#e0b23c' },
+      { artist: 'Steve Reich', title: 'Music for 18 Musicians', year: 1978, cat: 'LS-090', edition: 'ECM', bought: 'Kraków, 2022', fav: 'Pulses', note: 'The best on-call soundtrack ever recorded. Nothing bad has ever happened during Section IV.', c1: '#e6e0d3', c2: '#7d8fa0' },
+      { artist: 'Massive Attack', title: 'Mezzanine', year: 1998, cat: 'LS-103', edition: '2018 half-speed', bought: 'Birthday, 2023', fav: 'Angel', note: 'Loud, and the only record my downstairs neighbour has ever complimented.', c1: '#191b20', c2: '#4f6b7a' },
+      { artist: 'Aphex Twin', title: 'Selected Ambient Works', year: 1992, cat: 'LS-118', edition: 'Apollo repress', bought: 'Lisbon basement, 2019', fav: 'Xtal', note: 'The sleeve smells like that basement. I will not clean it.', c1: '#20242a', c2: '#5fa0a8' },
+      { artist: 'Radiohead', title: 'Kid A', year: 2000, cat: 'LS-126', edition: 'XL reissue', bought: 'Ljubljana, 2025', fav: 'How to Disappear…', note: 'I have owned this album in four formats. This is the last one, probably.', c1: '#7a2a1e', c2: '#e8663f' }
+    ],
+    postcards: [
+      { ref: 'PC-004', city: 'Lisbon', country: 'Portugal', year: '2019', date: '17.05.2019', text: 'Tiles everywhere, hills everywhere. Wrote three pages in a café and threw away two.', x: 3, y: 6, r: -4, w: 260, mx: 8, my: 76 },
+      { ref: 'PC-011', city: 'Tallinn', country: 'Estonia', year: '2021', date: '02.08.2021', text: 'Old town, cold wind, extremely good internet. Felt oddly like a well-documented codebase.', x: 26, y: 2, r: 3, w: 240, mx: 62, my: 20 },
+      { ref: 'PC-019', city: 'Hamburg', country: 'Germany', year: '2022', date: '11.03.2022', text: 'Rain sideways. Harbour cranes like a diagram of something I should understand.', x: 52, y: 9, r: -2, w: 250, mx: 43, my: 33 },
+      { ref: 'PC-023', city: 'Trieste', country: 'Italy', year: '2023', date: '04.09.2023', text: 'Wind, coffee, a harbour that smells like metal. Bought a record I cannot play here.', x: 74, y: 4, r: 5, w: 230, mx: 50, my: 58 },
+      { ref: 'PC-028', city: 'Kraków', country: 'Poland', year: '2022', date: '19.06.2022', text: 'Ate too much, walked it off, slept nine hours. A perfect and completely unremarkable day.', x: 8, y: 42, r: 2, w: 250, mx: 58, my: 38 },
+      { ref: 'PC-034', city: 'Utrecht', country: 'Netherlands', year: '2024', date: '28.04.2024', text: 'Everyone cycles like it is nothing. I cycled like it was something.', x: 34, y: 48, r: -5, w: 245, mx: 39, my: 30 },
+      { ref: 'PC-039', city: 'Bergen', country: 'Norway', year: '2024', date: '13.09.2024', text: 'Seven hours of rain, then twenty minutes of light that made the seven hours reasonable.', x: 58, y: 52, r: 4, w: 235, mx: 34, my: 8 },
+      { ref: 'PC-046', city: 'Ljubljana', country: 'Slovenia', year: '2025', date: '06.05.2025', text: 'Small city, enormous ice cream. Read an entire book on a bench by the river.', x: 78, y: 44, r: -3, w: 240, mx: 48, my: 48 }
+    ],
+    journey: [
+      { y: '2014', c: 'work', s: 'm', t: 'First backend job', b: 'Java 7, a monolith and a very patient colleague who reviewed everything twice.' },
+      { y: '2016', c: 'projects', s: 's', t: 'First home server', b: 'An old laptop under the desk. It ran for eleven days.', n: 'still have the sticker' },
+      { y: '2017', c: 'work', s: 's', t: 'Switched to Kotlin', b: 'Never went back.' },
+      { y: '2018', c: 'life', s: 'l', t: 'Moved to Germany', b: 'Two suitcases, a job offer and a vocabulary of about forty words. The first month was mostly forms. The second month was mostly quiet. By the third I had a favourite bakery, which is how you know it worked.', n: 'the hardest good decision' },
+      { y: '2019', c: 'small', s: 's', t: 'First 100 km ride', b: 'Nine hours, three wrong turns, one bakery.' },
+      { y: '2019', c: 'life', s: 'm', t: 'A2 German', b: 'Passed with a mark that nobody has ever asked about, and which I think about often.' },
+      { y: '2020', c: 'life', s: 'm', t: 'The long flat year', b: 'Nothing to show for it externally. Internally: learned how to be alone without it meaning something is wrong.', n: 'this counts too' },
+      { y: '2020', c: 'projects', s: 's', t: 'Reverse SSH tunnel', b: 'So the flat could talk to the internet on my terms.' },
+      { y: '2021', c: 'work', s: 'l', t: 'Tech lead', b: 'Given a team of four and the strange discovery that my best code was now other people’s code. Spent a year learning to say “what do you think?” before saying what I thought.' },
+      { y: '2021', c: 'projects', s: 'm', t: 'OCR pipeline for supermarket catalogues', b: 'A weekend idea that ran for four months and produced a spreadsheet of pasta prices nobody needed.' },
+      { y: '2022', c: 'small', s: 's', t: 'Fixed the washing machine', b: 'One YouTube video, one hex key, enormous satisfaction.' },
+      { y: '2022', c: 'work', s: 'm', t: 'Started mentoring interns', b: 'Nine so far. Six still write. Two are now better engineers than me at their thing.' },
+      { y: '2023', c: 'life', s: 'm', t: 'B2 German', b: 'Can now argue with an insurance company in the second language. A real milestone.', n: 'ich hätte gerne…' },
+      { y: '2023', c: 'work', s: 'l', t: 'Engineering manager', b: 'Six people, two teams, one migration that took three quarters and taught me more about writing than any essay.' },
+      { y: '2023', c: 'life', s: 's', t: 'Started writing fiction', b: 'Badly, and on purpose.' },
+      { y: '2024', c: 'small', s: 'm', t: '200 km in one day', b: 'Elbe to the coast. Cried a little around km 170, which I am told is normal.' },
+      { y: '2024', c: 'projects', s: 's', t: 'Self-hosted everything', b: 'Photos, notes, RSS, backups. Two disks, one UPS.' },
+      { y: '2025', c: 'life', s: 'm', t: 'Bought a drum kit', b: 'Month 7. Still counting out loud. The neighbours have been generous.', n: 'paradiddle, eventually' },
+      { y: '2025', c: 'work', s: 's', t: 'First person I hired left for something better', b: 'Which is, annoyingly, the goal.' },
+      { y: '2026', c: 'projects', s: 'm', t: 'This archive', b: 'Started because I could not remember 2020 and it turned out I had simply never written it down.' }
+    ],
+    articles: [
+      { k: 'essay', t: 'The migration that taught me to write', d: 'June 2026', r: '12 min', tg: 'management, writing', e: 'Three quarters of moving one service. The code was the easy part; the document explaining why was rewritten eleven times, and that document is what actually moved the system.' },
+      { k: 'technical', t: 'Kotlin coroutines on a boring Thursday', d: 'May 2026', r: '9 min', tg: 'kotlin, jvm', e: 'A structured-concurrency bug that only appeared under load, and the four wrong theories I had before the right one.' },
+      { k: 'note', t: 'Standing meetings should be shorter than the coffee', d: 'April 2026', r: '2 min', tg: 'management', e: 'A rule I keep breaking and keep reintroducing.' },
+      { k: 'project log', t: 'OCR pipeline, week 6: it works, sort of', d: 'March 2026', r: '7 min', tg: 'python, side projects', e: 'Tesseract, a scanner, 400 catalogue pages and the slow realisation that the interesting problem was never the recognition.' },
+      { k: 'personal', t: 'Learning an instrument at an age when you have opinions', d: 'February 2026', r: '6 min', tg: 'drums', e: 'Being bad at something in public is a skill you lose and have to deliberately regain.' },
+      { k: 'long read', t: 'On being the person who reviews instead of writes', d: 'January 2026', r: '15 min', tg: 'management, mentorship', e: 'What happens to your identity when the thing you were good at is no longer the thing you do all day, and why nobody warns you.' },
+      { k: 'technical', t: 'Postgres, one index and a 40× afternoon', d: 'Nov 2025', r: '8 min', tg: 'postgres, performance', e: 'The query plan was fine. The assumption underneath it was not.' },
+      { k: 'note', t: 'Self-hosting is a hobby, not a saving', d: 'Oct 2025', r: '3 min', tg: 'self-hosting', e: 'I calculated the hourly rate once. I will not do that again.' },
+      { k: 'personal', t: 'Six years of paperwork in a second language', d: 'Sep 2025', r: '10 min', tg: 'germany, life', e: 'Anmeldung, Steuer-ID, and the specific loneliness of understanding every word of a letter and none of its meaning.' },
+      { k: 'essay', t: 'A collection is an argument with forgetting', d: 'Aug 2025', r: '11 min', tg: 'collecting, vinyl', e: 'Why I keep postcards addressed to nobody and records I rarely play.' }
+    ],
+    projects: [
+      { code: 'IUS-01', name: 'Personal self-hosted infrastructure', st: 'Working', desc: 'Photos, notes, RSS, backups and a small monitoring stack running on two machines in a flat in Germany.', per: '2020 — ongoing', tech: 'Docker · Caddy · Postgres · Restic', learned: 'Operations is 10% setup and 90% the quiet Sunday when a disk starts failing.', c1: '#3b4a3a', c2: '#c7d4bf' },
+      { code: 'IUS-02', name: 'OCR pipeline for supermarket catalogues', st: 'Abandoned', desc: 'Scanned weekly catalogues, extracted products and prices, built a history nobody asked for.', per: '2021 — 2022', tech: 'Python · Tesseract · Postgres', learned: 'Data cleaning is the whole project. Also: an abandoned project is not a failed one if you can say what it taught you.', c1: '#4a3f2a', c2: '#d9c79a' },
+      { code: 'IUS-03', name: 'Reverse SSH home tunnel', st: 'Completed', desc: 'Reaching home services from anywhere without opening a single port on the router.', per: '2020', tech: 'SSH · systemd · WireGuard', learned: 'Reading the manual completely, once, is faster than reading it partly, five times.', c1: '#2c3a4a', c2: '#a9c0d1' },
+      { code: 'IUS-04', name: 'Fiction writing project', st: 'In progress', desc: 'A novel about a maintenance engineer on a structure nobody remembers building. 41 000 words.', per: '2023 — ongoing', tech: 'Plain text · git · stubbornness', learned: 'A first draft has the same purpose as a spike: prove the thing can exist.', c1: '#4a2f3a', c2: '#d5b0bd' },
+      { code: 'IUS-05', name: 'Internship mentorship programme', st: 'Working', desc: 'Structure, curriculum and review rituals for interns joining a backend team. Nine people through it.', per: '2022 — ongoing', tech: 'People · docs · patience', learned: 'The best teaching artefact is a written decision, not a meeting.', c1: '#3a442c', c2: '#c3cfa4' },
+      { code: 'IUS-06', name: 'Performance engineering experiments', st: 'Research', desc: 'A lab for JVM allocation profiling: same workload, twelve configurations, honest measurements.', per: '2024 — ongoing', tech: 'Kotlin · JMH · async-profiler', learned: 'Almost every intuition about performance is wrong until it is measured, including mine.', c1: '#2a2a30', c2: '#9aa0b5' },
+      { code: 'IUS-07', name: 'Postcard scanner', st: 'Frozen', desc: 'A tool to digitise both sides of a postcard and keep the handwriting readable. Scanned four cards.', per: '2023', tech: 'SANE · ImageMagick', learned: 'Some things are more pleasant analogue. The box is fine where it is.', c1: '#4a4438', c2: '#ddd0b4' },
+      { code: 'IUS-08', name: 'Ride log', st: 'Built it, learned something, moved on', desc: 'Self-hosted cycling tracker before I admitted the existing app was better.', per: '2021', tech: 'Kotlin · Spring · Leaflet', learned: 'Building your own version of a solved problem is a legitimate way to learn it.', c1: '#3d4a45', c2: '#b6cbc3' },
+      { code: 'IUS-09', name: 'Kitchen inventory with a barcode scanner', st: 'Idea', desc: 'It would work. It would also mean scanning every jar of lentils I own.', per: 'Someday', tech: 'TBD', learned: 'Not yet.', c1: '#4a4a2c', c2: '#d6d4a0' }
+    ],
+    memories: [
+      { k: 'Achievement', t: 'You moved to a country whose language you did not speak.', b: 'In 2018 you arrived with two suitcases and about forty words. You did the forms, the appointments, the phone calls you dreaded. Everything about your current life stands on that.', s: 'Filed under: journey / 2018' },
+      { k: 'An old goal, already reached', t: '“Lead a team one day.”', b: 'Written in a notebook in 2017, when it felt like something other people did. You have now done it for three years, and had the boring hard days that prove it was real work, not luck.', s: 'Filed under: cv / experience' },
+      { k: 'A good moment', t: 'The morning by the Elbe, 6:40.', b: 'You had not slept much. The light was ridiculous. You stopped, ate a terrible sandwich, and were happy in a way that did not need a reason.', s: 'Filed under: photos / 2024' },
+      { k: 'A finished project', t: 'The tunnel still runs.', b: 'You built it in 2020 in a week of evenings and it has needed almost nothing since. Quiet things you made are still working while you read this.', s: 'Filed under: projects / IUS-03' },
+      { k: 'A small success', t: 'You fixed the washing machine.', b: 'One video, one hex key, and the specific satisfaction of a thing that was broken and then was not.', s: 'Filed under: journey / small victories' },
+      { k: 'Once impossible', t: 'You argued with an insurance company in German. And won.', b: 'In 2018 you could not order bread without rehearsing it first.', s: 'Filed under: journey / 2023' },
+      { k: 'An object with a history', t: 'LS-042 — Nina Simone, Pastel Blues.', b: 'Carried in hand luggage from Trieste across two borders because you did not trust the hold. You still put on side one when you need to reset.', s: 'Filed under: collections / vinyl' },
+      { k: 'A message from a previous you', t: '“If today is only maintenance, that is still the job.”', b: 'Written in 2022, on a week when nothing shipped. It was true then and it is available to you now.', s: 'Filed under: notes / undated' }
+    ],
+    now: [
+      ['Working on', 'Leading two backend teams through the second half of a platform migration. Mostly writing documents, holding one-to-ones and removing obstacles that turn out to be other documents.'],
+      ['Learning', 'Drums, month 7 — currently the paradiddle, currently losing. Also German C1 grammar, at a pace best described as geological.'],
+      ['Reading', 'A biography of an engineer I had never heard of, and a very slow novel I keep restarting on purpose.'],
+      ['Building', 'This archive, and a JVM allocation-profiling lab that exists mainly so I can stop guessing.'],
+      ['Riding', 'Rebuilding base mileage after a flat winter. Target: 3 000 km this year, currently 1 180.'],
+      ['Next', 'Recording the drums badly and keeping the take. Possibly a fanzine about records nobody bought.']
+    ],
+    hobbies: [
+      { n: 'Writing', tag: '41 000 words', b: 'One novel in progress, several essays, a lot of deleted first paragraphs.', href: '#/articles', bg: '#fbf7ec', fg: '#17150f', bd: '1px solid #17150f', f: "'Instrument Serif',serif", basis: '1 1 300px' },
+      { n: 'Drums', tag: 'month 7', b: 'A four-piece kit, mesh heads, and a metronome I have learned to respect.', href: '#/now', bg: '#17150f', fg: '#f4f1ea', bd: '1px solid #17150f', f: "'IBM Plex Mono',monospace", basis: '1 1 220px' },
+      { n: 'Cycling', tag: '11 240 km', b: 'Long, flat, unglamorous rides. The bakery is a load-bearing part of the plan.', href: '#/journey', bg: '#dfe7e3', fg: '#1b2a25', bd: '1px solid #a9b7b0', f: "'Instrument Serif',serif", basis: '2 1 340px' },
+      { n: 'Self-hosting', tag: 'two disks, one UPS', b: 'Running my own small internet, badly and happily.', href: '#/projects', bg: '#eef0ea', fg: '#232821', bd: '1px dashed #17150f', f: "'IBM Plex Mono',monospace", basis: '1 1 260px' },
+      { n: 'Collecting', tag: '214 + 46', b: 'Records and postcards. An argument with forgetting.', href: '#/collections', bg: '#efe6f2', fg: '#2b2130', bd: '1px solid #bfaec6', f: "'Instrument Serif',serif", basis: '1 1 280px' },
+      { n: 'Side projects', tag: 'nine, some alive', b: 'Started for curiosity, kept for the lesson, abandoned without shame.', href: '#/projects', bg: '#fff6b8', fg: '#33301f', bd: '1px solid #ddd08a', f: "'Caveat',cursive", basis: '1 1 240px' }
+    ]
+  };
+
+  cover(r) { return { position: 'absolute', inset: 0, background: 'linear-gradient(150deg,' + r.c1 + ' 0%,' + r.c1 + ' 46%,' + r.c2 + ' 46%,' + r.c2 + ' 100%)' }; }
+
+  renderVals() {
+    const st = this.state, d = this.d;
+    const route = st.route;
+    const navHover = { color: 'var(--acc)', opacity: 1 };
+    const btnHover = { background: 'var(--acc)', color: '#fff', borderColor: 'var(--acc)' };
+
+    // journey
+    const jmap = { everything: 'Everything', work: 'Work', life: 'Life', projects: 'Projects', small: 'Small victories' };
+    const jItems = d.journey.filter(e => st.jf === 'everything' || e.c === st.jf).map((e, i) => {
+      const big = e.s === 'l', mid = e.s === 'm';
+      return {
+        year: e.y, cat: jmap[e.c] || e.c, title: e.t, body: e.b, note: e.n || '', hasNote: !!e.n,
+        wrapStyle: { breakInside: 'avoid', marginBottom: '16px', transform: 'rotate(' + ((i % 5) - 2) * 0.35 + 'deg)' },
+        cardStyle: big
+          ? { background: '#17150f', color: '#f0ece2', padding: '20px', border: '1px solid #17150f' }
+          : mid
+            ? { background: '#fffdf7', padding: '16px', border: '1px solid #cfc7b5', boxShadow: '2px 3px 0 rgba(23,21,15,.08)' }
+            : { background: 'transparent', padding: '10px 0', borderTop: '1px solid #c8c0ae' },
+        titleStyle: { fontFamily: big ? "'Instrument Serif',serif" : mid ? "'Instrument Serif',serif" : "'IBM Plex Mono',monospace", fontSize: big ? '32px' : mid ? '24px' : '14px', lineHeight: 1.12, fontWeight: big ? 400 : mid ? 400 : 600 }
+      };
+    });
+
+    // articles
+    const akinds = [['all', 'All'], ['essay', 'Essays'], ['technical', 'Technical'], ['note', 'Notes'], ['long read', 'Long reads'], ['project log', 'Project logs'], ['personal', 'Personal']];
+    const aItems = d.articles.filter(a => st.af === 'all' || a.k === st.af).map((a, i) => ({
+      kind: a.k, title: a.t, date: a.d, read: a.r, tags: a.tg, excerpt: a.e,
+      titleStyle: { margin: 0, fontWeight: 400, lineHeight: 1.06, fontFamily: a.k === 'note' ? "'IBM Plex Mono',monospace" : "'Instrument Serif',serif", fontSize: a.k === 'note' ? '19px' : i === 0 ? '38px' : '30px', fontStyle: a.k === 'essay' ? 'italic' : 'normal' }
+    }));
+
+    // projects
+    const stColors = { 'Working': '#2f7a3f', 'Completed': '#2f5a7a', 'In progress': '#8a6a1f', 'Research': '#5a4a8a', 'Frozen': '#4a6a7a', 'Abandoned': '#8a3a2a', 'Idea': '#7a7a5a', 'Built it, learned something, moved on': '#6a5a4a' };
+    const pfilters = [['all', 'All'], ['Working', 'Working'], ['In progress', 'In progress'], ['Completed', 'Completed'], ['Research', 'Research'], ['Frozen', 'Frozen'], ['Abandoned', 'Abandoned'], ['Idea', 'Idea']];
+    const pItems = d.projects.filter(p => st.pf === 'all' || p.st === st.pf).map(p => ({
+      code: p.code, name: p.name, desc: p.desc, period: p.per, tech: p.tech, learned: p.learned, status: p.st,
+      statusStyle: { color: stColors[p.st] || '#5b5347', border: '1px solid currentColor', padding: '2px 6px', fontSize: '9px' },
+      diagramStyle: { height: '100%', background: 'repeating-linear-gradient(90deg,' + p.c2 + ' 0 2px,transparent 2px 14px), linear-gradient(120deg,' + p.c1 + ',' + p.c2 + ')', opacity: .85 }
+    }));
+
+    // postcards
+    const pcs = d.postcards.map(p => {
+      const back = !!st.flipped[p.ref];
+      return {
+        ref: p.ref, city: p.city, country: p.country, year: p.year, date: p.date, text: p.text,
+        isFront: !back, isBack: back,
+        flip: () => this.setState(s => ({ flipped: Object.assign({}, s.flipped, { [p.ref]: !s.flipped[p.ref] }) })),
+        deskStyle: { position: 'absolute', left: p.x + '%', top: p.y + '%', width: p.w + 'px', transform: 'rotate(' + p.r + 'deg)' },
+        faceStyle: { display: 'block', width: '100%', aspectRatio: '3/2', padding: 0, border: '1px solid #b9b1a0', background: '#fdfaf2', boxShadow: '3px 4px 0 rgba(23,21,15,.14)', position: 'relative', overflow: 'hidden', transition: 'transform .25s ease' },
+        artStyle: { position: 'absolute', inset: 0, background: 'repeating-linear-gradient(' + (20 + p.x) + 'deg,#e0d8c6 0 8px,#d4cbb6 8px 16px)' },
+        mapStyle: { position: 'absolute', left: p.mx + '%', top: p.my + '%', display: 'flex', alignItems: 'center', gap: '6px' }
+      };
+    });
+
+    const drawerBase = { flex: '1 1 260px', minHeight: '170px', display: 'flex', flexDirection: 'column', gap: '7px', padding: '18px', border: 0, textDecoration: 'none' };
+    const drawers = [
+      { name: 'Vinyl', code: 'DR-01', note: '214 records, a system only I understand.', count: '→ open the shelf', href: '#/collections/vinyl', s: { background: '#151318', color: '#f0ece2' } },
+      { name: 'Postcards', code: 'DR-02', note: 'Mostly written to myself.', count: '46 cards', href: '#/collections/postcards', s: { background: '#fbf7ec', color: '#17150f', border: '1px solid #17150f', boxShadow: '4px 4px 0 rgba(23,21,15,.12)' } },
+      { name: 'Photos', code: 'DR-03', note: 'Contact sheets and a few enlargements.', count: '9 sheets', href: '#/photos', s: { background: '#e6e0d3', color: '#17150f' } },
+      { name: 'Books', code: 'DR-04', note: 'Read, half-read, and aspirational.', count: '183 volumes', href: '#/collections', s: { background: '#dfe7e3', color: '#1b2a25', border: '1px solid #a9b7b0' } },
+      { name: 'Devices', code: 'DR-05', note: 'Two dead laptops kept for parts and sentiment.', count: '11 items', href: '#/projects', s: { background: '#eef0ea', color: '#232821', border: '1px dashed #17150f' } },
+      { name: 'Memories', code: 'DR-06', note: 'Not catalogued. Cannot be.', count: 'open /remember', href: '#/remember', s: { background: '#efe6f2', color: '#2b2130' } },
+      { name: 'Unfinished projects', code: 'DR-07', note: 'The largest drawer, obviously.', count: '∞', href: '#/projects', s: { background: '#fff6b8', color: '#33301f', transform: 'rotate(-1deg)' } }
+    ].map(x => ({ name: x.name, code: x.code, note: x.note, count: x.count, href: x.href, style: Object.assign({}, drawerBase, x.s) }));
+
+    const chaos = [
+      { tag: 'CV § languages', text: 'Russian, English, German (B2, aggressively practised)', href: '#/cv', bg: '#fffdf7', rot: -1.2 },
+      { tag: 'record LS-090', text: 'Music for 18 Musicians — the on-call soundtrack', href: '#/vinyl', bg: '#151318', fg: '#f0ece2', rot: 1.4 },
+      { tag: 'note, undated', text: 'Everything in this cabinet was once a Tuesday.', href: '#/journey', bg: '#fff6b8', rot: -2 },
+      { tag: 'project IUS-07', text: 'Postcard scanner · frozen · scanned four cards', href: '#/projects', bg: '#eef0ea', rot: .8 },
+      { tag: 'photo 04', text: 'Elbe, 6:40, the good light', href: '#/photos', bg: '#dfe7e3', rot: -1.6 },
+      { tag: 'small victory', text: 'Fixed the washing machine (2022)', href: '#/journey', bg: '#fffdf7', rot: 2.2 },
+      { tag: 'hobby', text: 'Drums, month 7, still counting out loud', href: '#/hobbies', bg: '#efe6f2', rot: -.6 },
+      { tag: 'for later', text: 'You have been here before →', href: '#/remember', bg: '#c0442a', fg: '#fff', rot: 1.8 }
+    ].map(k => ({ tag: k.tag, text: k.text, href: k.href, style: { flex: '1 1 200px', maxWidth: '320px', padding: '14px', background: k.bg, color: k.fg || '#17150f', border: '1px solid rgba(23,21,15,.35)', transform: 'rotate(' + k.rot + 'deg)', textDecoration: 'none' } }));
+
+    const frames = Array.from({ length: 12 }, (_, i) => ({
+      style: { flex: '1 1 54px', aspectRatio: '3/2', background: 'repeating-linear-gradient(' + (15 + i * 13) + 'deg,#cbc3b0 0 5px,#b8b09c 5px 10px)', outline: i === 3 || i === 8 ? '2px solid #ff6a45' : 'none', outlineOffset: '1px' }
+    }));
+
+    const photoCards = [
+      { caption: 'The flat, first week. One chair, borrowed.', meta: 'Germany · Feb 2018', a: 32 },
+      { caption: 'Record shop basement, Lisbon. Smelled exactly as expected.', meta: 'Portugal · May 2019', a: 61 },
+      { caption: 'Kit assembled on the living-room rug. Instructions ignored.', meta: 'Home · Jan 2025', a: 12 },
+      { caption: 'Km 170. The face of a man who has made choices.', meta: 'Elbe route · May 2024', a: 47 }
+    ].map(p => ({ caption: p.caption, meta: p.meta, imgStyle: { aspectRatio: '4/3', background: 'repeating-linear-gradient(' + p.a + 'deg,#ded7c6 0 8px,#d0c8b4 8px 16px)' } }));
+
+    const cvSections = [
+      { title: 'Experience', rows: [
+        { head: 'Engineering Manager', meta: '2023 — present', body: 'Two backend teams, six engineers. Hiring, growth plans, architecture review, and a platform migration delivered over three quarters. Reduced on-call incidents by roughly half by making ownership explicit and boring.' },
+        { head: 'Tech Lead, Backend', meta: '2021 — 2023', body: 'Led a team of four on JVM services handling order and pricing flows. Introduced structured code review, a written decision log and an internship track.' },
+        { head: 'Senior Backend Developer', meta: '2018 — 2021', body: 'Kotlin/Java services on Spring Boot, PostgreSQL and Kafka. Owned a payments integration end to end, including the parts nobody wanted to own.' },
+        { head: 'Backend Developer', meta: '2014 — 2018', body: 'Monolith maintenance, then extraction of the first three services. Learned the difference between a system that works and a system you can operate.' }
+      ] },
+      { title: 'Selected achievements', rows: [
+        { head: 'Nine interns mentored', meta: '2022 — present', body: 'Designed the programme, curriculum and review rituals. Six converted to full-time roles.' },
+        { head: 'Platform migration', meta: '2024 — 2025', body: 'Moved core services with no customer-visible downtime; the written plan became the team’s reference document.' },
+        { head: 'Performance work', meta: '2025', body: '40× improvement on a critical query path, and a profiling practice the team still uses.' }
+      ] },
+      { title: 'Technical', rows: [{ head: 'Kotlin · Java · Spring Boot · PostgreSQL · Kafka · Docker · Kubernetes · Grafana · JMH', meta: '', body: 'Comfortable in JVM performance work, service extraction, observability and pragmatic testing. Not a frontend engineer, and honest about it.' }] },
+      { title: 'Management', rows: [{ head: 'Hiring · growth plans · one-to-ones · incident culture · written decisions', meta: '', body: 'Prefer clear documents over long meetings, and explicit ownership over heroics.' }] },
+      { title: 'Languages & education', rows: [
+        { head: 'Russian (native) · English (fluent) · German (B2)', meta: '', body: 'German exam passed 2023; still working towards C1 with the enthusiasm of someone who must call the tax office.' },
+        { head: 'BSc, Computer Science', meta: 'graduated 2014', body: 'Thesis on distributed task scheduling; the code has mercifully been lost.' }
+      ] },
+      { title: 'Contact', rows: [{ head: 'hello@olegthelilfix.com', meta: '', body: 'Open to conversations about engineering management, mentorship and JVM performance. Not looking, but always reading.' }] }
+    ];
+
+    const mem = d.memories[st.mem % d.memories.length];
+    const rec = st.rec != null ? d.vinyl[st.rec] : null;
+
+    return {
+      accent: this.props.accent || '#c0442a',
+      navHover, btnHover, bigBtnHover: { background: 'var(--ink)', color: 'var(--paper)' },
+      wander: this.wander,
+      isHome: route === 'home', isCv: route === 'cv', isJourney: route === 'journey', isRemember: route === 'remember',
+      isArticles: route === 'articles', isProjects: route === 'projects', isCollections: route === 'collections',
+      isVinyl: route === 'vinyl', isPostcards: route === 'postcards', isPhotos: route === 'photos',
+      isHobbies: route === 'hobbies', isNow: route === 'now',
+
+      densityChips: this.chips([['calm', 'Calm'], ['normal', 'Normal'], ['oleg', 'Oleg']], st.density, 'density'),
+      densityNote: st.density === 'calm' ? 'quiet today. that is allowed.' : st.density === 'oleg' ? 'you asked for this' : 'the usual amount of everything',
+      notCalm: st.density !== 'calm',
+      isCalm: st.density === 'calm',
+      isOleg: st.density === 'oleg',
+      chaosCards: chaos,
+
+      hero: { title: 'Grew from backend developer to engineering manager', body: 'Eleven years, four titles, one very long migration and nine interns who now know things I do not.', year: '2014 → 2026' },
+      latest: { kind: 'Essay', title: 'The migration that taught me to write', excerpt: 'Three quarters of moving one service. The code was the easy part; the document explaining why was rewritten eleven times.', date: 'June 2026', read: '12 min' },
+      current: { name: 'IUS-01 · personal infrastructure', line1: 'uptime 214d · 2 disks · 1 UPS · 0 subscriptions', line2: 'last change: moved backups to a second location' },
+      homeVinyl: d.vinyl.slice(0, 4).map(r => ({ artist: r.artist, cat: r.cat, coverStyle: this.cover(r) })),
+
+      cvSections,
+
+      journeyChips: this.chips([['everything', 'Everything'], ['work', 'Work'], ['life', 'Life'], ['projects', 'Projects'], ['small', 'Small victories']], st.jf, 'jf'),
+      journeyItems: jItems, journeyCount: jItems.length,
+
+      memory: { kind: mem.k, title: mem.t, body: mem.b, stamp: mem.s },
+      memKey: 'm' + st.mem,
+      memProgress: (st.mem % d.memories.length + 1) + ' of ' + d.memories.length + ' pieces of evidence',
+      nextMemory: () => this.setState(s => ({ mem: s.mem + 1 })),
+
+      articleChips: this.chips(akinds, st.af, 'af'),
+      articleItems: aItems,
+
+      projectChips: this.chips(pfilters, st.pf, 'pf'),
+      projectItems: pItems,
+
+      drawers,
+
+      records: d.vinyl.map((r, i) => ({
+        artist: r.artist, title: r.title, year: r.year, cat: r.cat,
+        coverStyle: this.cover(r),
+        tileStyle: { flex: '1 1 ' + (i % 4 === 0 ? '210px' : i % 3 === 0 ? '150px' : '175px'), maxWidth: '260px', background: 'none', border: 0, padding: 0, transform: 'rotate(' + ((i % 5) - 2) * 0.5 + 'deg)' },
+        open: () => this.setState({ rec: i })
+      })),
+      recOpen: rec != null,
+      rec: rec ? Object.assign({}, rec, { coverStyle: Object.assign({}, this.cover(rec), { position: 'relative', width: '100%', height: '100%' }) }) : {},
+      closeRec: () => this.setState({ rec: null }),
+      stop: (e) => e.stopPropagation(),
+
+      pcChips: this.chips([['desk', 'Desk'], ['archive', 'Archive'], ['map', 'Map']], st.pcv, 'pcv'),
+      pcDesk: st.pcv === 'desk', pcArchive: st.pcv === 'archive', pcMap: st.pcv === 'map',
+      postcards: pcs,
+
+      frames, photoCards,
+
+      hobbies: d.hobbies.map(h => ({
+        name: h.n, tag: h.tag, body: h.b, href: h.href,
+        style: { flex: h.basis, display: 'flex', flexDirection: 'column', gap: '8px', padding: '20px', minHeight: '180px', background: h.bg, color: h.fg, border: h.bd, textDecoration: 'none' },
+        titleStyle: { fontFamily: h.f, fontSize: h.f.indexOf('Mono') > -1 ? '24px' : '34px', lineHeight: 1.05 }
+      })),
+
+      nowEntries: d.now.map(n => ({ label: n[0], text: n[1] }))
+    };
+  }
+}
+</script>
+</body>
+</html>

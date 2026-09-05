@@ -1,0 +1,49 @@
+{
+  "kind": "collectionType",
+  "collectionName": "postcards",
+  "info": {
+    "singularName": "postcard",
+    "pluralName": "postcards",
+    "displayName": "Postcard",
+    "description": "A postcard in the postal archive"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "ref": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "city": {
+      "type": "string",
+      "required": true
+    },
+    "country": {
+      "type": "string",
+      "required": true
+    },
+    "year": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "text": {
+      "type": "text"
+    },
+    "deskX": { "type": "float" },
+    "deskY": { "type": "float" },
+    "deskRotate": { "type": "float" },
+    "deskWidth": { "type": "integer" },
+    "mapX": { "type": "float" },
+    "mapY": { "type": "float" },
+    "visibility": {
+      "type": "enumeration",
+      "enum": ["public", "unlisted", "private"],
+      "default": "public",
+      "required": true
+    }
+  }
+}
