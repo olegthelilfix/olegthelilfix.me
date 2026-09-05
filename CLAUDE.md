@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-The personal archive site **olegthelilfix.com** — a "digital museum / cabinet of curiosities" for Oleg Aleksandrov. The guiding aesthetic is **managed chaos** — each section is its own small visual world, while global navigation, typography, URLs and accessibility stay consistent.
+The personal archive site **olegthelilfix.me** — a "digital museum / cabinet of curiosities" for Oleg Aleksandrov. The guiding aesthetic is **managed chaos** — each section is its own small visual world, while global navigation, typography, URLs and accessibility stay consistent.
 
 Two apps live in this repo:
 - **Frontend** (repo root) — Next.js 16, the site itself.
@@ -37,7 +37,7 @@ npm run build    # build the Strapi admin panel
 
 For the full stack, run both. The frontend reads `STRAPI_URL` (see `.env.local`, default `http://localhost:1337`); with the CMS off it silently uses mock data. There is no unit/E2E suite yet, but `npm run smoke -- <base-url>` verifies every route, metadata endpoints, 404 behavior and security headers against a running production server.
 
-**Production / deploy:** the whole stack is containerised in `docker-compose.yml` — `caddy` (auto-TLS reverse proxy, the only service publishing :80/:443), `web` (`Dockerfile`, Next.js standalone), `cms` (`cms/Dockerfile`, non-root Strapi), `db` (Postgres with separate Strapi/n8n roles), and a pinned `n8n` image. Every service has a healthcheck and bounded Docker logs. Caddy routes by domain (`Caddyfile`): `olegthelilfix.com`→web, `cms.olegthelilfix.com`→cms admin, `n8n.olegthelilfix.com`→n8n. Generate `.env` with `scripts/generate-production-env.sh`; create the first CMS/n8n owners privately with `docker-compose.bootstrap.yml`; only then start the public stack. Full procedure, DNS and rollback are in `DEPLOY.md`.
+**Production / deploy:** the whole stack is containerised in `docker-compose.yml` — `caddy` (auto-TLS reverse proxy, the only service publishing :80/:443), `web` (`Dockerfile`, Next.js standalone), `cms` (`cms/Dockerfile`, non-root Strapi), and `db` (Postgres with a least-privilege Strapi role). Every service has a healthcheck and bounded Docker logs. Caddy routes by domain (`Caddyfile`): `olegthelilfix.me`→web and `cms.olegthelilfix.me`→cms admin. Generate `.env` with `scripts/generate-production-env.sh`; create the first CMS owner privately with `docker-compose.bootstrap.yml`; only then start the public stack. Full procedure, DNS and rollback are in `DEPLOY.md`.
 
 ## Architecture
 

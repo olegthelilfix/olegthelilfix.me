@@ -858,7 +858,7 @@ export const cvSeed = {
   "role": "Engineering Manager · Backend Developer",
   "summary": "Engineering manager and backend developer with eleven years on JVM systems. Comfortable owning services end to end, growing engineers, and preferring a clear written decision over a long meeting.",
   "location": "Germany",
-  "email": "hello@olegthelilfix.com",
+  "email": "hello@olegthelilfix.me",
   "sections": [
     {
       "title": "Experience",
@@ -944,7 +944,7 @@ export const cvSeed = {
       "title": "Contact",
       "rows": [
         {
-          "head": "hello@olegthelilfix.com",
+          "head": "hello@olegthelilfix.me",
           "meta": "",
           "body": "Open to conversations about engineering management, mentorship and JVM performance. Not looking, but always reading."
         }

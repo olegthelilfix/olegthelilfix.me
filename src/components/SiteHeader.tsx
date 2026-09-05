@@ -21,7 +21,7 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
-          <a className={styles.link} href="mailto:hello@olegthelilfix.com">
+          <a className={styles.link} href="mailto:hello@olegthelilfix.me">
             Contact
           </a>
         </nav>

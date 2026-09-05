@@ -1,54 +1,74 @@
-# Owner launch checklist
+# Чеклист владельца: GitHub Actions → Hetzner
 
-These items need your accounts, decisions or access and therefore cannot be
-completed from the repository alone.
+В репозитории уже находится deployment workflow. Пункты ниже требуют доступа к
+вашим GitHub, Hetzner и DNS-аккаунтам, поэтому их нельзя выполнить локально.
 
-## Repository
+## 1. Репозиторий GitHub
 
-- [ ] Restore or create the Git repository: the current working folder has no `.git`.
-- [ ] Add a private/public remote and push a clean main branch.
-- [ ] Confirm `.env*`, `.next/`, `node_modules/`, `cms/.tmp/` and backups are absent from Git history.
-- [ ] If any secret may have been shared or committed, rotate all database, Strapi and n8n secrets.
-- [ ] Enable branch protection and require the `CI` workflow before merging.
+- [ ] Отправить текущие изменения в `origin/master` или `origin/main`.
+- [ ] Убедиться, что во вкладке Actions успешно проходит workflow `CI`.
+- [ ] В Settings → Actions → General разрешить Actions читать репозиторий и
+  записывать packages (`Read and write permissions`), если политика репозитория
+  не выдаёт `packages: write` из workflow.
+- [ ] Создать GitHub Environment с точным именем `production`.
+- [ ] Ограничить Environment ветками `main`/`master`; включить подтверждение
+  деплоя, если ваш GitHub-тариф это поддерживает.
 
-## Domain and server
+## 2. Сервер Hetzner
 
-- [ ] Provision a Linux server with Docker Compose, at least 2 CPU and 4 GB RAM.
-- [ ] Configure SSH keys; disable password SSH login when possible.
-- [ ] Allow inbound 80/TCP, 443/TCP and 443/UDP.
-- [ ] Confirm 5432, 1337 and 5678 are not public.
-- [ ] Create A records for apex, `www`, `cms` and `n8n`.
-- [ ] Add AAAA only if IPv6 is actually configured and firewalled.
-- [ ] Set DNS registrar auto-renew and account MFA.
+- [ ] Создать Ubuntu/Debian server: минимум 2 vCPU, 4 GB RAM.
+- [ ] Установить Docker Engine, Docker Compose plugin, OpenSSL и SSH server.
+- [ ] Создать отдельного пользователя `deploy`, добавить его в группу `docker`.
+- [ ] Создать `/opt/olegthelilfix` с владельцем `deploy:deploy` и правами `0750`.
+- [ ] Разрешить в firewall SSH, TCP 80/443 и UDP 443.
+- [ ] Убедиться, что 3000, 5432 и 1337 не открыты в интернет.
+- [ ] Проверить под пользователем `deploy`: `docker run --rm hello-world`.
 
-## First secure startup
+## 3. SSH для GitHub Actions
 
-- [ ] Clone a specific release commit/tag onto the server.
-- [ ] Run `./scripts/generate-production-env.sh .env` on the server.
-- [ ] Save an encrypted off-server copy of `.env`.
-- [ ] Run the bootstrap Compose command from `DEPLOY.md`; do not start Caddy yet.
-- [ ] Use the SSH tunnel to create the first Strapi administrator.
-- [ ] Use the SSH tunnel to create the first n8n owner.
-- [ ] Verify both logins, then start the normal Compose stack.
-- [ ] Confirm `docker compose ps` reports every service healthy.
+- [ ] Создать отдельный ключ `~/.ssh/olegthelilfix_deploy`.
+- [ ] Добавить только публичную часть ключа в
+  `/home/deploy/.ssh/authorized_keys` на сервере.
+- [ ] Получить SSH host key сервера и сверить fingerprint через Hetzner Console.
+- [ ] Добавить secret `HETZNER_HOST` — IP или hostname сервера.
+- [ ] Добавить secret `HETZNER_SSH_PRIVATE_KEY` — полный приватный deployment key.
+- [ ] Добавить secret `HETZNER_SSH_KNOWN_HOSTS` — проверенную строку host key.
+- [ ] Если значения отличаются от стандартных, добавить variables:
+  `HETZNER_SSH_USER`, `HETZNER_SSH_PORT`, `HETZNER_DEPLOY_PATH`.
+- [ ] Не добавлять production `.env` или его значения в GitHub Secrets: он будет
+  создан непосредственно на сервере.
 
-## Content and identity
+## 4. Первый безопасный запуск
 
-- [ ] Confirm the public name, biography, CV, contact email and dates are accurate.
-- [ ] Decide whether the site launches in English only.
-- [ ] Replace placeholder photo gradients with real approved media, or explicitly accept the placeholder launch.
-- [ ] Reconcile catalogue claims with available entries: currently 12/214 records and 8/46 postcards are seeded.
-- [ ] Confirm every item marked `public` is safe to publish; keep sensitive entries private.
-- [ ] Confirm `hello@olegthelilfix.com` exists and can receive mail.
+- [ ] В Actions вручную запустить `Deploy to Hetzner` в режиме `bootstrap`.
+- [ ] Убедиться, что Action завершился успешно.
+- [ ] Открыть SSH tunnel для локального порта 1337 по инструкции
+  [DEPLOY.md](./DEPLOY.md).
+- [ ] Через tunnel создать первого администратора Strapi.
+- [ ] Сохранить зашифрованную внешнюю копию
+  `/opt/olegthelilfix/shared/.env`.
+- [ ] Больше не запускать режим `bootstrap`.
 
-## Verification and operations
+## 5. DNS и production
 
-- [ ] Run `npm run smoke -- https://olegthelilfix.com` after DNS/TLS is live.
-- [ ] Verify a Strapi edit reaches the frontend after the 60-second ISR window.
-- [ ] Verify a private Strapi record is not returned anonymously.
-- [ ] Verify uploads and n8n workflows survive container restarts.
-- [ ] Configure an encrypted off-server backup destination.
-- [ ] Run `./scripts/backup.sh` and test restoration on a disposable host.
-- [ ] Add uptime checks for the site, CMS `/_health` and n8n `/healthz`.
-- [ ] Decide whether CMS and n8n should remain IP/VPN-restricted permanently.
-- [ ] Set a monthly dependency/OS update reminder and review `SECURITY.md`.
+- [ ] Создать A-записи для apex, `www` и `cms` на IPv4 Hetzner.
+- [ ] Добавлять AAAA только при полностью настроенном IPv6/firewall.
+- [ ] Дождаться публичного обновления DNS.
+- [ ] Запустить `Deploy to Hetzner` вручную в режиме `production`.
+- [ ] Проверить `https://olegthelilfix.me` и TLS всех поддоменов.
+- [ ] Запустить `npm run smoke -- https://olegthelilfix.me`.
+- [ ] Проверить CMS `/_health`.
+- [ ] Проверить, что private-запись Strapi не читается анонимно.
+- [ ] Проверить сохранность Strapi uploads после restart контейнера.
+
+## 6. После успешного запуска
+
+- [ ] Добавить GitHub Actions variable `AUTO_DEPLOY_ENABLED=true`, если каждый
+  успешный push в `main`/`master` должен автоматически идти в production.
+- [ ] Настроить uptime checks сайта и CMS.
+- [ ] Настроить зашифрованное off-server хранилище backup.
+- [ ] Выполнить `scripts/backup.sh` и проверить восстановление на временном host.
+- [ ] Проверить реальные имя, CV, контакты, даты и публичность контента.
+- [ ] Заменить placeholder-медиа или явно принять запуск с ними.
+- [ ] Проверить расхождение каталогов: сейчас заполнены 12/214 пластинок и 8/46
+  открыток.

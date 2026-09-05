@@ -24,8 +24,8 @@ export function SiteFooter() {
           ))}
         </nav>
         <div className={styles.meta}>
-          olegthelilfix.com · est. somewhere around 2014 ·{" "}
-          <a href="mailto:hello@olegthelilfix.com">hello@olegthelilfix.com</a>
+          olegthelilfix.me · est. somewhere around 2014 ·{" "}
+          <a href="mailto:hello@olegthelilfix.me">hello@olegthelilfix.me</a>
         </div>
       </div>
     </footer>

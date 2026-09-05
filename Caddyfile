@@ -2,7 +2,7 @@
 # once these names resolve (DNS A/AAAA → this server) and ports 80/443 are open.
 # ACME contact email — override with {$ACME_EMAIL} in the environment.
 {
-	email {$ACME_EMAIL:hello@olegthelilfix.com}
+	email {$ACME_EMAIL:hello@olegthelilfix.me}
 }
 
 (security) {
@@ -17,24 +17,18 @@
 }
 
 # Frontend (Next.js)
-olegthelilfix.com {
+olegthelilfix.me {
 	import security
 	reverse_proxy web:3000
 }
 
 # www → apex redirect
-www.olegthelilfix.com {
-	redir https://olegthelilfix.com{uri} permanent
+www.olegthelilfix.me {
+	redir https://olegthelilfix.me{uri} permanent
 }
 
 # Strapi CMS admin + API
-cms.olegthelilfix.com {
+cms.olegthelilfix.me {
 	import security
 	reverse_proxy cms:1337
-}
-
-# n8n automation
-n8n.olegthelilfix.com {
-	import security
-	reverse_proxy n8n:5678
 }

@@ -1,0 +1,198 @@
+name: Deploy to Hetzner
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: First run uses bootstrap; use production after creating the Strapi owner
+        required: true
+        default: bootstrap
+        type: choice
+        options:
+          - bootstrap
+          - production
+  workflow_run:
+    workflows: [CI]
+    branches: [main, master]
+    types: [completed]
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: production-hetzner
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       vars.AUTO_DEPLOY_ENABLED == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment:
+      name: production
+      url: https://olegthelilfix.me
+
+    steps:
+      - name: Checkout the verified revision
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+
+      - name: Resolve release metadata
+        id: release
+        shell: bash
+        env:
+          REQUESTED_MODE: ${{ inputs.mode }}
+        run: |
+          set -euo pipefail
+          release_sha=$(git rev-parse HEAD)
+          repository=${GITHUB_REPOSITORY,,}
+          deploy_mode=production
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            deploy_mode=$REQUESTED_MODE
+          fi
+          case "$deploy_mode" in
+            bootstrap|production) ;;
+            *) echo "Unsupported deployment mode" >&2; exit 1 ;;
+          esac
+          echo "sha=$release_sha" >> "$GITHUB_OUTPUT"
+          echo "mode=$deploy_mode" >> "$GITHUB_OUTPUT"
+          echo "web_image=ghcr.io/${repository}-web" >> "$GITHUB_OUTPUT"
+          echo "cms_image=ghcr.io/${repository}-cms" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+
+      - name: Log in to GHCR
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish frontend
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.release.outputs.web_image }}:${{ steps.release.outputs.sha }}
+            ${{ steps.release.outputs.web_image }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ steps.release.outputs.sha }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
+
+      - name: Build and publish CMS
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        with:
+          context: ./cms
+          push: true
+          tags: |
+            ${{ steps.release.outputs.cms_image }}:${{ steps.release.outputs.sha }}
+            ${{ steps.release.outputs.cms_image }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ steps.release.outputs.sha }}
+          cache-from: type=gha,scope=cms
+          cache-to: type=gha,mode=max,scope=cms
+
+      - name: Prepare release bundle and SSH
+        id: transport
+        shell: bash
+        env:
+          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
+          HETZNER_SSH_PRIVATE_KEY: ${{ secrets.HETZNER_SSH_PRIVATE_KEY }}
+          HETZNER_SSH_KNOWN_HOSTS: ${{ secrets.HETZNER_SSH_KNOWN_HOSTS }}
+          HETZNER_SSH_USER: ${{ vars.HETZNER_SSH_USER || 'deploy' }}
+          HETZNER_SSH_PORT: ${{ vars.HETZNER_SSH_PORT || '22' }}
+          HETZNER_DEPLOY_PATH: ${{ vars.HETZNER_DEPLOY_PATH || '/opt/olegthelilfix' }}
+          RELEASE_SHA: ${{ steps.release.outputs.sha }}
+        run: |
+          set -euo pipefail
+          : "${HETZNER_HOST:?Add the HETZNER_HOST secret to the production environment}"
+          : "${HETZNER_SSH_PRIVATE_KEY:?Add HETZNER_SSH_PRIVATE_KEY}"
+          : "${HETZNER_SSH_KNOWN_HOSTS:?Add HETZNER_SSH_KNOWN_HOSTS}"
+          [[ "$HETZNER_HOST" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "Invalid HETZNER_HOST" >&2; exit 1; }
+          [[ "$HETZNER_SSH_USER" =~ ^[A-Za-z_][A-Za-z0-9_-]*$ ]] || { echo "Invalid HETZNER_SSH_USER" >&2; exit 1; }
+          [[ "$HETZNER_SSH_PORT" =~ ^[0-9]{1,5}$ ]] || { echo "Invalid HETZNER_SSH_PORT" >&2; exit 1; }
+          [[ "$HETZNER_DEPLOY_PATH" =~ ^/[A-Za-z0-9_./-]+$ ]] || { echo "Invalid HETZNER_DEPLOY_PATH" >&2; exit 1; }
+
+          ssh_key="$RUNNER_TEMP/hetzner_key"
+          known_hosts="$RUNNER_TEMP/known_hosts"
+          archive="$RUNNER_TEMP/olegthelilfix-release-$RELEASE_SHA.tar.gz"
+          printf '%s\n' "$HETZNER_SSH_PRIVATE_KEY" > "$ssh_key"
+          printf '%s\n' "$HETZNER_SSH_KNOWN_HOSTS" > "$known_hosts"
+          chmod 600 "$ssh_key" "$known_hosts"
+
+          tar -czf "$archive" \
+            docker-compose.yml \
+            docker-compose.bootstrap.yml \
+            Caddyfile \
+            db/init \
+            scripts/backup.sh \
+            scripts/generate-production-env.sh \
+            scripts/remote-deploy.sh
+
+          echo "ssh_key=$ssh_key" >> "$GITHUB_OUTPUT"
+          echo "known_hosts=$known_hosts" >> "$GITHUB_OUTPUT"
+          echo "archive=$archive" >> "$GITHUB_OUTPUT"
+          echo "remote_archive=/tmp/olegthelilfix-release-$RELEASE_SHA.tar.gz" >> "$GITHUB_OUTPUT"
+          echo "remote_script=/tmp/olegthelilfix-remote-deploy-$RELEASE_SHA.sh" >> "$GITHUB_OUTPUT"
+          echo "ssh_user=$HETZNER_SSH_USER" >> "$GITHUB_OUTPUT"
+          echo "ssh_port=$HETZNER_SSH_PORT" >> "$GITHUB_OUTPUT"
+          echo "deploy_path=$HETZNER_DEPLOY_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release bundle
+        shell: bash
+        env:
+          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
+          SSH_KEY: ${{ steps.transport.outputs.ssh_key }}
+          KNOWN_HOSTS: ${{ steps.transport.outputs.known_hosts }}
+          SSH_USER: ${{ steps.transport.outputs.ssh_user }}
+          SSH_PORT: ${{ steps.transport.outputs.ssh_port }}
+          ARCHIVE: ${{ steps.transport.outputs.archive }}
+          REMOTE_ARCHIVE: ${{ steps.transport.outputs.remote_archive }}
+          REMOTE_SCRIPT: ${{ steps.transport.outputs.remote_script }}
+        run: |
+          set -euo pipefail
+          ssh_options=(-i "$SSH_KEY" -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$KNOWN_HOSTS")
+          scp "${ssh_options[@]}" -P "$SSH_PORT" "$ARCHIVE" "$SSH_USER@$HETZNER_HOST:$REMOTE_ARCHIVE"
+          scp "${ssh_options[@]}" -P "$SSH_PORT" scripts/remote-deploy.sh "$SSH_USER@$HETZNER_HOST:$REMOTE_SCRIPT"
+
+      - name: Deploy immutable release
+        shell: bash
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
+          SSH_KEY: ${{ steps.transport.outputs.ssh_key }}
+          KNOWN_HOSTS: ${{ steps.transport.outputs.known_hosts }}
+          SSH_USER: ${{ steps.transport.outputs.ssh_user }}
+          SSH_PORT: ${{ steps.transport.outputs.ssh_port }}
+          DEPLOY_PATH: ${{ steps.transport.outputs.deploy_path }}
+          REMOTE_ARCHIVE: ${{ steps.transport.outputs.remote_archive }}
+          REMOTE_SCRIPT: ${{ steps.transport.outputs.remote_script }}
+          RELEASE_SHA: ${{ steps.release.outputs.sha }}
+          DEPLOY_MODE: ${{ steps.release.outputs.mode }}
+          WEB_IMAGE: ${{ steps.release.outputs.web_image }}
+          CMS_IMAGE: ${{ steps.release.outputs.cms_image }}
+          REGISTRY_USER: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+          printf -v remote_command 'sh %q %q %q %q %q %q %q %q' \
+            "$REMOTE_SCRIPT" "$RELEASE_SHA" "$DEPLOY_MODE" "$DEPLOY_PATH" \
+            "$WEB_IMAGE" "$CMS_IMAGE" "$REMOTE_ARCHIVE" "$REGISTRY_USER"
+          printf '%s\n' "$GHCR_TOKEN" | ssh \
+            -i "$SSH_KEY" \
+            -p "$SSH_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$KNOWN_HOSTS" \
+            "$SSH_USER@$HETZNER_HOST" "$remote_command"

@@ -1,4 +1,4 @@
-# olegthelilfix.com
+# olegthelilfix.me
 
 Personal archive and digital cabinet of curiosities for Oleg Aleksandrov.
 
@@ -6,7 +6,8 @@ The repository contains two applications and their production infrastructure:
 
 - `src/` — Next.js 16 App Router frontend;
 - `cms/` — Strapi 5 content management system;
-- `docker-compose.yml` — Caddy, frontend, CMS, Postgres and n8n;
+- `docker-compose.yml` — Caddy, frontend, CMS and Postgres;
+- `.github/workflows/deploy.yml` — GHCR build and Hetzner deployment;
 - `src/data/` — bundled fallback content used when Strapi is unavailable.
 
 ## Local development
@@ -55,21 +56,21 @@ The smoke test covers every public page, metadata routes, the health endpoint,
 
 ## Production
 
-Production is self-hosted with Docker Compose. Only Caddy publishes host ports
-80/443. Postgres, Next.js, Strapi and n8n remain on the internal network.
+Production is self-hosted with Docker Compose. GitHub Actions publishes
+commit-SHA-tagged application images to GHCR and deploys them to Hetzner over
+SSH. Only Caddy publishes host ports 80/443. Postgres, Next.js and Strapi remain
+on the internal network.
 
-Do not expose CMS or n8n before their first owner accounts exist. Follow the
-bootstrap procedure in [DEPLOY.md](./DEPLOY.md), then complete
+Do not expose CMS before its first owner account exists. Follow the bootstrap
+procedure in [DEPLOY.md](./DEPLOY.md), then complete
 [OWNER_CHECKLIST.md](./OWNER_CHECKLIST.md).
 
-Useful commands:
+For local Compose verification:
 
 ```bash
-./scripts/generate-production-env.sh .env
 docker compose config --quiet
 docker compose up -d --build
 docker compose ps
-./scripts/backup.sh
 ```
 
 ## Content model
@@ -84,7 +85,7 @@ task, documented in the owner checklist.
 
 ## Operational documentation
 
-- [DEPLOY.md](./DEPLOY.md) — deployment, bootstrap, update, backup and rollback runbook;
+- [DEPLOY.md](./DEPLOY.md) — GitHub/Hetzner setup, bootstrap, deployment, backup and rollback runbook;
 - [OWNER_CHECKLIST.md](./OWNER_CHECKLIST.md) — actions that require domain/server/account ownership;
 - [SECURITY.md](./SECURITY.md) — security policy and known upstream dependency exception;
 - [CLAUDE.md](./CLAUDE.md) — detailed repository architecture and development conventions.

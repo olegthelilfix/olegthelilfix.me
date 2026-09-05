@@ -84,7 +84,7 @@ export function HomeCollage({
           occasional builder of unnecessary systems.
         </p>
         <p className={styles.est}>
-          Personal archive · olegthelilfix.com · est. somewhere around 2014
+          Personal archive · olegthelilfix.me · est. somewhere around 2014
         </p>
       </header>
 
