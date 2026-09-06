@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: First run uses bootstrap; use production after creating the Strapi owner
+        description: Bootstrap first; use production after creating the Strapi owner and read-only API token
         required: true
         default: bootstrap
         type: choice
@@ -65,6 +65,7 @@ jobs:
           echo "mode=$deploy_mode" >> "$GITHUB_OUTPUT"
           echo "web_image=ghcr.io/${repository}-web" >> "$GITHUB_OUTPUT"
           echo "cms_image=ghcr.io/${repository}-cms" >> "$GITHUB_OUTPUT"
+          echo "mcp_image=ghcr.io/${repository}-mcp" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
@@ -103,6 +104,20 @@ jobs:
             org.opencontainers.image.revision=${{ steps.release.outputs.sha }}
           cache-from: type=gha,scope=cms
           cache-to: type=gha,mode=max,scope=cms
+
+      - name: Build and publish MCP gateway
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        with:
+          context: ./mcp
+          push: true
+          tags: |
+            ${{ steps.release.outputs.mcp_image }}:${{ steps.release.outputs.sha }}
+            ${{ steps.release.outputs.mcp_image }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ steps.release.outputs.sha }}
+          cache-from: type=gha,scope=mcp
+          cache-to: type=gha,mode=max,scope=mcp
 
       - name: Prepare release bundle and SSH
         id: transport
@@ -183,12 +198,13 @@ jobs:
           DEPLOY_MODE: ${{ steps.release.outputs.mode }}
           WEB_IMAGE: ${{ steps.release.outputs.web_image }}
           CMS_IMAGE: ${{ steps.release.outputs.cms_image }}
+          MCP_IMAGE: ${{ steps.release.outputs.mcp_image }}
           REGISTRY_USER: ${{ github.actor }}
         run: |
           set -euo pipefail
-          printf -v remote_command 'sh %q %q %q %q %q %q %q %q' \
+          printf -v remote_command 'sh %q %q %q %q %q %q %q %q %q' \
             "$REMOTE_SCRIPT" "$RELEASE_SHA" "$DEPLOY_MODE" "$DEPLOY_PATH" \
-            "$WEB_IMAGE" "$CMS_IMAGE" "$REMOTE_ARCHIVE" "$REGISTRY_USER"
+            "$WEB_IMAGE" "$CMS_IMAGE" "$MCP_IMAGE" "$REMOTE_ARCHIVE" "$REGISTRY_USER"
           printf '%s\n' "$GHCR_TOKEN" | ssh \
             -i "$SSH_KEY" \
             -p "$SSH_PORT" \

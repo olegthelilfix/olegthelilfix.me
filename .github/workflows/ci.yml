@@ -43,10 +43,26 @@ jobs:
       # SECURITY.md documents the upstream exception; critical remains blocking.
       - run: npm audit --omit=dev --audit-level=critical
 
+  mcp:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mcp
+    steps:
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mcp/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm audit --omit=dev --audit-level=high
+
   containers:
     runs-on: ubuntu-latest
-    needs: [frontend, cms]
+    needs: [frontend, cms, mcp]
     steps:
       - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
       - run: docker compose --env-file .env.docker.example config --quiet
-      - run: docker compose --env-file .env.docker.example build web cms
+      - run: docker compose --env-file .env.docker.example build web cms mcp

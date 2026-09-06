@@ -8,15 +8,16 @@ die() {
   exit 1
 }
 
-[ "$#" -eq 7 ] || die "expected: RELEASE_SHA MODE DEPLOY_ROOT WEB_IMAGE CMS_IMAGE ARCHIVE REGISTRY_USER"
+[ "$#" -eq 8 ] || die "expected: RELEASE_SHA MODE DEPLOY_ROOT WEB_IMAGE CMS_IMAGE MCP_IMAGE ARCHIVE REGISTRY_USER"
 
 release_sha=$1
 deploy_mode=$2
 deploy_root=$3
 web_image=$4
 cms_image=$5
-release_archive=$6
-registry_user=$7
+mcp_image=$6
+release_archive=$7
+registry_user=$8
 
 case "$release_sha" in
   ''|*[!0-9a-f]*) die "release SHA must contain lowercase hexadecimal characters only" ;;
@@ -35,12 +36,12 @@ esac
 case "$deploy_root" in
   *[!A-Za-z0-9_./-]*) die "deploy root contains unsupported characters" ;;
 esac
-case "$web_image:$cms_image" in
+case "$web_image:$cms_image:$mcp_image" in
   *[!a-z0-9_./:-]*) die "container image name contains unsupported characters" ;;
 esac
-case "$web_image:$cms_image" in
-  ghcr.io/*:ghcr.io/*) ;;
-  *) die "both application images must come from ghcr.io" ;;
+case "$web_image:$cms_image:$mcp_image" in
+  ghcr.io/*:ghcr.io/*:ghcr.io/*) ;;
+  *) die "all application images must come from ghcr.io" ;;
 esac
 case "$registry_user" in
   ''|*[!A-Za-z0-9_-]*) die "invalid registry username" ;;
@@ -86,6 +87,21 @@ if [ ! -s "$environment_file" ]; then
   "$release_dir/scripts/generate-production-env.sh" "$environment_file"
 fi
 chmod 0600 "$environment_file"
+
+# Add MCP settings to environments created by releases that predate the MCP
+# gateway. The external access token can be generated safely here; the Strapi
+# API token must be created by the owner in Strapi after bootstrap.
+if ! grep -q '^MCP_ACCESS_TOKEN=' "$environment_file"; then
+  printf 'MCP_ACCESS_TOKEN=%s\n' "$(openssl rand -hex 32)" >> "$environment_file"
+fi
+if ! grep -q '^STRAPI_API_TOKEN=' "$environment_file"; then
+  printf 'STRAPI_API_TOKEN=\n' >> "$environment_file"
+fi
+
+if [ "$deploy_mode" = production ] && ! grep -Eq '^STRAPI_API_TOKEN=.+$' "$environment_file"; then
+  die "STRAPI_API_TOKEN is empty in $environment_file; create a read-only Strapi API token and add it before production"
+fi
+
 ln -sfn "$environment_file" "$release_dir/.env"
 
 if [ "$deploy_mode" = bootstrap ] && [ -L "$deploy_root/current" ]; then
@@ -98,12 +114,12 @@ registry_logged_in=true
 unset registry_token
 
 compose() {
-  WEB_IMAGE="$web_image" CMS_IMAGE="$cms_image" IMAGE_TAG="$release_sha" \
+  WEB_IMAGE="$web_image" CMS_IMAGE="$cms_image" MCP_IMAGE="$mcp_image" IMAGE_TAG="$release_sha" \
     docker compose --env-file "$environment_file" -f "$compose_file" "$@"
 }
 
 bootstrap_compose() {
-  WEB_IMAGE="$web_image" CMS_IMAGE="$cms_image" IMAGE_TAG="$release_sha" \
+  WEB_IMAGE="$web_image" CMS_IMAGE="$cms_image" MCP_IMAGE="$mcp_image" IMAGE_TAG="$release_sha" \
     docker compose --env-file "$environment_file" \
       -f "$compose_file" -f "$bootstrap_file" "$@"
 }
@@ -115,7 +131,7 @@ if [ "$deploy_mode" = bootstrap ]; then
   bootstrap_compose ps
 else
   compose config --quiet
-  compose pull web cms
+  compose pull web cms mcp
   compose up -d --no-build --remove-orphans --wait --wait-timeout 300
   compose ps
 fi
@@ -125,6 +141,7 @@ RELEASE_SHA=$release_sha
 DEPLOY_MODE=$deploy_mode
 WEB_IMAGE=$web_image
 CMS_IMAGE=$cms_image
+MCP_IMAGE=$mcp_image
 EOF
 chmod 0640 "$release_dir/deployment.env"
 ln -sfn "$release_dir" "$deploy_root/current"

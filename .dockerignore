@@ -8,6 +8,7 @@ Dockerfile
 docker-compose.yml
 # separate app / archives, not part of the frontend image
 cms
+mcp
 reference
 # local env + editor + plans
 .env*

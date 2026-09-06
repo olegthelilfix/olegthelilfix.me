@@ -1,6 +1,6 @@
 # Hetzner deployment through GitHub Actions
 
-The production workflow builds the Next.js and Strapi images, pushes immutable
+The production workflow builds the Next.js, Strapi and MCP images, pushes immutable
 commit-SHA tags to GitHub Container Registry (GHCR), uploads a small release
 bundle over SSH and runs Docker Compose on one Hetzner server. Application
 secrets are generated on the server and never pass through GitHub.
@@ -9,6 +9,7 @@ secrets are generated on the server and never pass through GitHub.
 |---|---|---|
 | Next.js | `https://olegthelilfix.me` | through Caddy only |
 | Strapi | `https://cms.olegthelilfix.me` | through Caddy only |
+| Strapi MCP | `https://mcp.olegthelilfix.me/mcp` | through Caddy; Bearer token required |
 | PostgreSQL | none | Docker network only |
 
 ## 1. Prepare the Hetzner server
@@ -95,7 +96,7 @@ branch and choose `bootstrap`.
 
 The workflow will:
 
-1. build and publish both app images with the Git commit SHA;
+1. build and publish all three app images with the Git commit SHA;
 2. create `/opt/olegthelilfix/shared/.env` with mode `0600` on the server;
 3. create a least-privilege Strapi PostgreSQL role/database;
 4. start PostgreSQL and Strapi with the CMS port bound only to server loopback;
@@ -113,6 +114,27 @@ Create and verify the first owners before exposing either service:
 
 - Strapi: `http://127.0.0.1:1337/admin`.
 
+In Strapi, open **Settings → API Tokens → Create new API Token**. Create a
+`Custom` token named `MCP read-only` and grant only `find`/`findOne` for the
+content types that the MCP server may read. Copy the token immediately; Strapi
+shows it only once.
+
+Add it to the server environment over SSH:
+
+```bash
+ssh -i ~/.ssh/olegthelilfix_deploy deploy@<SERVER_IP_OR_HOSTNAME>
+nano /opt/olegthelilfix/shared/.env
+```
+
+Set the previously empty value, save and close the editor:
+
+```text
+STRAPI_API_TOKEN=<THE_READ_ONLY_STRAPI_TOKEN>
+```
+
+`MCP_ACCESS_TOKEN` is generated automatically during bootstrap. Do not replace
+it with the Strapi token: the two tokens protect different trust boundaries.
+
 Do not run `bootstrap` again after it succeeds; the server script will reject it.
 
 ## 5. Configure DNS and launch production
@@ -123,6 +145,7 @@ Point these records to the Hetzner server:
 olegthelilfix.me        A     <SERVER_IPV4>
 www.olegthelilfix.me    A     <SERVER_IPV4>
 cms.olegthelilfix.me    A     <SERVER_IPV4>
+mcp.olegthelilfix.me    A     <SERVER_IPV4>
 ```
 
 Add AAAA only if IPv6 is configured and firewalled. Wait until the records
@@ -135,6 +158,7 @@ Verify from your computer:
 ```bash
 npm run smoke -- https://olegthelilfix.me
 curl -fsS https://cms.olegthelilfix.me/_health
+curl -fsS https://mcp.olegthelilfix.me/healthz
 ```
 
 On the server:
@@ -143,7 +167,31 @@ On the server:
 cd /opt/olegthelilfix/current
 docker compose ps
 docker compose logs --tail=100 caddy cms web db
+docker compose logs --tail=100 mcp
 ```
+
+## Connect Codex to the MCP endpoint
+
+Read the generated gateway token on the server:
+
+```bash
+grep '^MCP_ACCESS_TOKEN=' /opt/olegthelilfix/shared/.env
+```
+
+Expose the value to the local Codex process as `OLEG_STRAPI_MCP_TOKEN`, then add
+this to `~/.codex/config.toml` (or a trusted project's `.codex/config.toml`):
+
+```toml
+[mcp_servers.oleg_strapi]
+url = "https://mcp.olegthelilfix.me/mcp"
+bearer_token_env_var = "OLEG_STRAPI_MCP_TOKEN"
+required = true
+default_tools_approval_mode = "auto"
+```
+
+Restart Codex and check the server with `/mcp`. The gateway currently exposes
+only read-only tools: `list_content_types`, `list_entries`, `get_entry` and
+`get_single_type`.
 
 ## 6. Enable automatic deployments
 

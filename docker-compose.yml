@@ -1,10 +1,11 @@
-# Full stack: Caddy (TLS) + Next.js frontend + Strapi CMS + Postgres.
+# Full stack: Caddy (TLS) + Next.js + Strapi + read-only MCP + Postgres.
 # Copy .env.docker.example to .env, fill the secrets, then: docker compose up -d --build
 #
 # Domains (point DNS A/AAAA records at this server):
 #   olegthelilfix.me       -> web  (frontend)
 #   www.olegthelilfix.me   -> redirect to apex
 #   cms.olegthelilfix.me   -> cms  (Strapi admin + API)
+#   mcp.olegthelilfix.me   -> mcp  (authenticated Streamable HTTP)
 name: olegthelilfix
 
 x-logging: &default-logging
@@ -32,6 +33,8 @@ services:
       web:
         condition: service_healthy
       cms:
+        condition: service_healthy
+      mcp:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:2019/config/ >/dev/null || exit 1"]
@@ -97,6 +100,28 @@ services:
       timeout: 5s
       retries: 10
       start_period: 45s
+
+  mcp:
+    image: ${MCP_IMAGE:-olegthelilfix-mcp}:${IMAGE_TAG:-local}
+    build: ./mcp
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      cms:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      STRAPI_URL: http://cms:1337
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN-}
+      MCP_ACCESS_TOKEN: ${MCP_ACCESS_TOKEN:?set MCP_ACCESS_TOKEN in .env}
+      MCP_ALLOWED_HOSTS: mcp.olegthelilfix.me,localhost,127.0.0.1,mcp
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/readyz').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   web:
     image: ${WEB_IMAGE:-olegthelilfix-web}:${IMAGE_TAG:-local}

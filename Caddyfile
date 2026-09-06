@@ -32,3 +32,9 @@ cms.olegthelilfix.me {
 	import security
 	reverse_proxy cms:1337
 }
+
+# Authenticated read-only MCP gateway for Strapi
+mcp.olegthelilfix.me {
+	import security
+	reverse_proxy mcp:3001
+}
