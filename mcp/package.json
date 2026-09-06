@@ -1,9 +1,9 @@
 {
   "name": "olegthelilfix-strapi-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Read-only MCP gateway for the olegthelilfix.me Strapi CMS",
+  "description": "Authenticated MCP gateway for the olegthelilfix.me Strapi CMS",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",

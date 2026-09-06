@@ -37,6 +37,7 @@ app_key_4=$(openssl rand -base64 16)
   echo "ENCRYPTION_KEY=$(openssl rand -base64 32)"
   echo "MCP_ACCESS_TOKEN=$(openssl rand -hex 32)"
   echo "STRAPI_API_TOKEN="
+  echo "MCP_WRITE_ENABLED=false"
 } > "$target_file"
 
 echo "Created $target_file with mode 600"

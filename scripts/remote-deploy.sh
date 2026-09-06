@@ -89,7 +89,7 @@ fi
 chmod 0600 "$environment_file"
 
 # Add MCP settings to environments created by releases that predate the MCP
-# gateway. The external access token can be generated safely here; the Strapi
+# gateway. The gateway access token can be generated safely here; the Strapi
 # API token must be created by the owner in Strapi after bootstrap.
 if ! grep -q '^MCP_ACCESS_TOKEN=' "$environment_file"; then
   printf 'MCP_ACCESS_TOKEN=%s\n' "$(openssl rand -hex 32)" >> "$environment_file"
@@ -97,9 +97,12 @@ fi
 if ! grep -q '^STRAPI_API_TOKEN=' "$environment_file"; then
   printf 'STRAPI_API_TOKEN=\n' >> "$environment_file"
 fi
+if ! grep -q '^MCP_WRITE_ENABLED=' "$environment_file"; then
+  printf 'MCP_WRITE_ENABLED=false\n' >> "$environment_file"
+fi
 
 if [ "$deploy_mode" = production ] && ! grep -Eq '^STRAPI_API_TOKEN=.+$' "$environment_file"; then
-  die "STRAPI_API_TOKEN is empty in $environment_file; create a read-only Strapi API token and add it before production"
+  die "STRAPI_API_TOKEN is empty in $environment_file; create a Custom Strapi API token and add it before production"
 fi
 
 ln -sfn "$environment_file" "$release_dir/.env"

@@ -6,7 +6,7 @@ The repository contains two applications, an MCP gateway and their production in
 
 - `src/` — Next.js 16 App Router frontend;
 - `cms/` — Strapi 5 content management system;
-- `mcp/` — authenticated read-only Streamable HTTP gateway for Strapi;
+- `mcp/` — authenticated Streamable HTTP gateway for Strapi; writes are opt-in;
 - `docker-compose.yml` — Caddy, frontend, CMS, MCP and Postgres;
 - `.github/workflows/deploy.yml` — GHCR build and Hetzner deployment;
 - `src/data/` — bundled fallback content used when Strapi is unavailable.
@@ -60,9 +60,10 @@ The smoke test covers every public page, metadata routes, the health endpoint,
 
 Production is self-hosted with Docker Compose. GitHub Actions publishes
 commit-SHA-tagged application images to GHCR and deploys them to Hetzner over
-SSH. Only Caddy publishes host ports 80/443. Postgres, Next.js, Strapi and the
-MCP gateway remain on the internal network. Caddy exposes the authenticated MCP
-endpoint at `https://mcp.olegthelilfix.me/mcp`.
+SSH. Caddy is the only Internet-facing service and publishes ports 80/443.
+Postgres, Next.js and Strapi stay on the internal network. The MCP gateway is
+published only on the server loopback address (`127.0.0.1:3001`) and is reached
+from Codex through an SSH tunnel plus a Bearer token.
 
 Do not expose CMS before its first owner account exists. Follow the bootstrap
 procedure in [DEPLOY.md](./DEPLOY.md), then complete

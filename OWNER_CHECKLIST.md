@@ -21,7 +21,7 @@
 - [ ] Создать отдельного пользователя `deploy`, добавить его в группу `docker`.
 - [ ] Создать `/opt/olegthelilfix` с владельцем `deploy:deploy` и правами `0750`.
 - [ ] Разрешить в firewall SSH, TCP 80/443 и UDP 443.
-- [ ] Убедиться, что 3000, 5432 и 1337 не открыты в интернет.
+- [ ] Убедиться, что 3000, 3001, 5432 и 1337 не открыты в интернет.
 - [ ] Проверить под пользователем `deploy`: `docker run --rm hello-world`.
 
 ## 3. SSH для GitHub Actions
@@ -45,24 +45,27 @@
 - [ ] Открыть SSH tunnel для локального порта 1337 по инструкции
   [DEPLOY.md](./DEPLOY.md).
 - [ ] Через tunnel создать первого администратора Strapi.
-- [ ] Создать в Strapi Custom API token `MCP read-only` только с разрешениями
-  `find`/`findOne` для нужных content types.
+- [ ] Создать в Strapi Custom API token `MCP content editor` с разрешениями
+  `find`, `findOne`, `create`, `update` для нужных content types, без `delete`.
 - [ ] По SSH записать token в `STRAPI_API_TOKEN` файла
   `/opt/olegthelilfix/shared/.env`.
+- [ ] Для редактирования через MCP установить там `MCP_WRITE_ENABLED=true`.
 - [ ] Сохранить зашифрованную внешнюю копию
   `/opt/olegthelilfix/shared/.env`.
 - [ ] Больше не запускать режим `bootstrap`.
 
 ## 5. DNS и production
 
-- [ ] Создать A-записи для apex, `www`, `cms` и `mcp` на IPv4 Hetzner.
+- [ ] Создать A-записи для apex, `www` и `cms` на IPv4 Hetzner.
+- [ ] Удалить старые A/AAAA-записи `mcp.olegthelilfix.me`, если они существуют.
 - [ ] Добавлять AAAA только при полностью настроенном IPv6/firewall.
 - [ ] Дождаться публичного обновления DNS.
 - [ ] Запустить `Deploy to Hetzner` вручную в режиме `production`.
-- [ ] Проверить `https://olegthelilfix.me` и TLS всех поддоменов.
+- [ ] Проверить `https://olegthelilfix.me`, `https://cms.olegthelilfix.me` и TLS.
 - [ ] Запустить `npm run smoke -- https://olegthelilfix.me`.
 - [ ] Проверить CMS `/_health`.
-- [ ] Проверить MCP `/healthz` и отказ `/mcp` без Bearer token.
+- [ ] Через SSH tunnel на локальный порт 3001 проверить MCP `/healthz` и код
+  `401` от `/mcp` без Bearer token.
 - [ ] Проверить, что private-запись Strapi не читается анонимно.
 - [ ] Проверить сохранность Strapi uploads после restart контейнера.
 
@@ -71,8 +74,12 @@
 - [ ] Добавить GitHub Actions variable `AUTO_DEPLOY_ENABLED=true`, если каждый
   успешный push в `main`/`master` должен автоматически идти в production.
 - [ ] Настроить uptime checks сайта и CMS.
-- [ ] Подключить `https://mcp.olegthelilfix.me/mcp` к Codex через
+- [ ] Создать отдельный SSH-ключ `~/.ssh/olegthelilfix_mcp` и ограничить его в
+  `authorized_keys` только tunnel к `127.0.0.1:3001` по инструкции DEPLOY.md.
+- [ ] Подключить `http://127.0.0.1:3001/mcp` к Codex через SSH tunnel и
   `bearer_token_env_var`, не сохраняя gateway token в репозитории.
+- [ ] Установить `default_tools_approval_mode = "writes"`, чтобы Codex спрашивал
+  подтверждение перед изменением контента.
 - [ ] Настроить зашифрованное off-server хранилище backup.
 - [ ] Выполнить `scripts/backup.sh` и проверить восстановление на временном host.
 - [ ] Проверить реальные имя, CV, контакты, даты и публичность контента.
