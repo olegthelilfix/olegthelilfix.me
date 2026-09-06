@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: Bootstrap first; use production after creating the Strapi owner and read-only API token
+        description: Bootstrap first; use production after creating the Strapi owner and scoped MCP API token
         required: true
         default: bootstrap
         type: choice
