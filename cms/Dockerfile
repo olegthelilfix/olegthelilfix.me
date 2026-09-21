@@ -2,7 +2,7 @@
 # Debian slim base so native deps (better-sqlite3, sharp) install cleanly.
 # Build stage compiles the admin panel; runner serves it against Postgres.
 
-FROM node:22-slim AS build
+FROM node:25-slim AS build
 WORKDIR /opt/app
 RUN apt-get update \
   && apt-get install -y --no-install-recommends python3 make g++ \
@@ -12,7 +12,7 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:22-slim AS runner
+FROM node:25-slim AS runner
 WORKDIR /opt/app
 ENV NODE_ENV=production
 ENV HOME=/home/node
