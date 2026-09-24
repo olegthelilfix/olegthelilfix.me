@@ -11,8 +11,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-# The CMS is not reachable at build time, so pages prerender from the mock
-# fallback; at runtime ISR revalidates them against the real STRAPI_URL.
+# Content is imported from the repository's /content directory, so every page
+# is built from the exact same immutable Git revision as the application.
 RUN npm run build
 
 FROM node:22-alpine AS runner

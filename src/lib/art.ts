@@ -1,4 +1,4 @@
-import type { CoverArt } from "@/data/types";
+import type { CoverArt } from "@content/types";
 
 /** Record/album sleeve placeholder — a hard diagonal split, as on the shelf. */
 export function sleeveGradient({ from, to }: CoverArt): string {

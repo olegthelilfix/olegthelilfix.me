@@ -2,8 +2,8 @@
 
 # dependencies
 /node_modules
-/mcp/node_modules
-/mcp/dist
+/cms/
+/mcp/
 /.pnp
 .pnp.*
 .yarn/*
@@ -44,5 +44,4 @@ yarn-error.log*
 next-env.d.ts
 
 # keep the example env templates
-!.env.example
 !.env.docker.example

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { VinylRecord } from "@/data/types";
+import type { VinylRecord } from "@content/types";
 import { sleeveGradient } from "@/lib/art";
 import styles from "./vinyl.module.css";
 

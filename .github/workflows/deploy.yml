@@ -2,15 +2,6 @@ name: Deploy to Hetzner
 
 on:
   workflow_dispatch:
-    inputs:
-      mode:
-        description: Bootstrap first; use production after creating the Strapi owner and scoped MCP API token
-        required: true
-        default: bootstrap
-        type: choice
-        options:
-          - bootstrap
-          - production
   workflow_run:
     workflows: [CI]
     branches: [main, master]
@@ -32,7 +23,7 @@ jobs:
        github.event.workflow_run.event == 'push' &&
        vars.AUTO_DEPLOY_ENABLED == 'true')
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
     environment:
       name: production
       url: https://olegthelilfix.me
@@ -47,25 +38,12 @@ jobs:
       - name: Resolve release metadata
         id: release
         shell: bash
-        env:
-          REQUESTED_MODE: ${{ inputs.mode }}
         run: |
           set -euo pipefail
           release_sha=$(git rev-parse HEAD)
           repository=${GITHUB_REPOSITORY,,}
-          deploy_mode=production
-          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            deploy_mode=$REQUESTED_MODE
-          fi
-          case "$deploy_mode" in
-            bootstrap|production) ;;
-            *) echo "Unsupported deployment mode" >&2; exit 1 ;;
-          esac
           echo "sha=$release_sha" >> "$GITHUB_OUTPUT"
-          echo "mode=$deploy_mode" >> "$GITHUB_OUTPUT"
           echo "web_image=ghcr.io/${repository}-web" >> "$GITHUB_OUTPUT"
-          echo "cms_image=ghcr.io/${repository}-cms" >> "$GITHUB_OUTPUT"
-          echo "mcp_image=ghcr.io/${repository}-mcp" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
@@ -77,7 +55,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and publish frontend
+      - name: Build and publish website
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
         with:
           context: .
@@ -90,34 +68,6 @@ jobs:
             org.opencontainers.image.revision=${{ steps.release.outputs.sha }}
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
-
-      - name: Build and publish CMS
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
-        with:
-          context: ./cms
-          push: true
-          tags: |
-            ${{ steps.release.outputs.cms_image }}:${{ steps.release.outputs.sha }}
-            ${{ steps.release.outputs.cms_image }}:latest
-          labels: |
-            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-            org.opencontainers.image.revision=${{ steps.release.outputs.sha }}
-          cache-from: type=gha,scope=cms
-          cache-to: type=gha,mode=max,scope=cms
-
-      - name: Build and publish MCP gateway
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
-        with:
-          context: ./mcp
-          push: true
-          tags: |
-            ${{ steps.release.outputs.mcp_image }}:${{ steps.release.outputs.sha }}
-            ${{ steps.release.outputs.mcp_image }}:latest
-          labels: |
-            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-            org.opencontainers.image.revision=${{ steps.release.outputs.sha }}
-          cache-from: type=gha,scope=mcp
-          cache-to: type=gha,mode=max,scope=mcp
 
       - name: Prepare release bundle and SSH
         id: transport
@@ -147,14 +97,7 @@ jobs:
           printf '%s\n' "$HETZNER_SSH_KNOWN_HOSTS" > "$known_hosts"
           chmod 600 "$ssh_key" "$known_hosts"
 
-          tar -czf "$archive" \
-            docker-compose.yml \
-            docker-compose.bootstrap.yml \
-            Caddyfile \
-            db/init \
-            scripts/backup.sh \
-            scripts/generate-production-env.sh \
-            scripts/remote-deploy.sh
+          tar -czf "$archive" docker-compose.yml Caddyfile
 
           echo "ssh_key=$ssh_key" >> "$GITHUB_OUTPUT"
           echo "known_hosts=$known_hosts" >> "$GITHUB_OUTPUT"
@@ -195,16 +138,13 @@ jobs:
           REMOTE_ARCHIVE: ${{ steps.transport.outputs.remote_archive }}
           REMOTE_SCRIPT: ${{ steps.transport.outputs.remote_script }}
           RELEASE_SHA: ${{ steps.release.outputs.sha }}
-          DEPLOY_MODE: ${{ steps.release.outputs.mode }}
           WEB_IMAGE: ${{ steps.release.outputs.web_image }}
-          CMS_IMAGE: ${{ steps.release.outputs.cms_image }}
-          MCP_IMAGE: ${{ steps.release.outputs.mcp_image }}
           REGISTRY_USER: ${{ github.actor }}
         run: |
           set -euo pipefail
-          printf -v remote_command 'sh %q %q %q %q %q %q %q %q %q' \
-            "$REMOTE_SCRIPT" "$RELEASE_SHA" "$DEPLOY_MODE" "$DEPLOY_PATH" \
-            "$WEB_IMAGE" "$CMS_IMAGE" "$MCP_IMAGE" "$REMOTE_ARCHIVE" "$REGISTRY_USER"
+          printf -v remote_command 'sh %q %q %q %q %q %q' \
+            "$REMOTE_SCRIPT" "$RELEASE_SHA" "$DEPLOY_PATH" \
+            "$WEB_IMAGE" "$REMOTE_ARCHIVE" "$REGISTRY_USER"
           printf '%s\n' "$GHCR_TOKEN" | ssh \
             -i "$SSH_KEY" \
             -p "$SSH_PORT" \

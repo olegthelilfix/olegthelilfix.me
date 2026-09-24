@@ -5,35 +5,21 @@
 Do not open a public issue for a suspected vulnerability or exposed secret.
 Contact `hello@olegthelilfix.me` with reproduction steps and affected URLs.
 
-## Dependency policy
+## Deployment controls
 
-- Frontend production dependencies must pass `npm audit --omit=dev --audit-level=high`.
-- CMS production dependencies must pass at `critical` and are reviewed manually at `high` because Strapi controls a large transitive admin-panel tree.
-- Never run `npm audit fix --force` without reviewing the proposed major-version changes and rebuilding both applications.
-
-## Deployment credentials
-
+- Frontend production dependencies must pass
+  `npm audit --omit=dev --audit-level=high`.
 - GitHub Actions connects with a dedicated SSH key owned by the non-root
-  `deploy` user; do not reuse a personal SSH key.
-- Pin the verified SSH host key in `HETZNER_SSH_KNOWN_HOSTS`; never replace it
-  without comparing the new fingerprint through Hetzner Console.
-- Production application secrets live only in
-  `/opt/olegthelilfix/shared/.env` on the server and in an encrypted backup.
-- The workflow uses a short-lived `GITHUB_TOKEN` to pull private GHCR images and
-  logs out on the server after each deployment.
-- Third-party GitHub Actions are pinned to immutable commit SHAs and updated by
-  Dependabot.
+  `deploy` user.
+- The verified host key is pinned in `HETZNER_SSH_KNOWN_HOSTS`.
+- The workflow uses a short-lived `GITHUB_TOKEN` for GHCR and logs out on the
+  server after each deployment.
+- Third-party Actions are pinned to immutable commit SHAs.
+- Caddy is the only public container; the Next.js port is internal.
 
-## Known upstream exception
+## Content model
 
-As of 2026-09-05, Strapi 5.52.1 depends on an Admin AI SDK chain that resolves
-`@ai-sdk/provider-utils` 3.0.x. npm reports GHSA-866g-f22w-33x8 and offers only
-an incompatible Strapi downgrade or AI SDK major override. The affected code is
-part of the authenticated Strapi admin build, not the public Next.js frontend.
-
-Mitigations:
-
-- keep the CMS admin hostname access-restricted where practical;
-- do not expose the initial admin registration publicly;
-- monitor Strapi releases and remove this exception as soon as a compatible fix ships;
-- treat any new `critical` advisory as release-blocking.
+The site has no CMS login, database, public content API or runtime content
+credentials. Public visibility is enforced centrally in
+`src/lib/content.ts`. Secrets and private personal information must never be
+committed to `content/`, even when an item uses `visibility: "private"`.

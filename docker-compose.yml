@@ -1,10 +1,6 @@
-# Full stack: Caddy (TLS) + Next.js + Strapi + authenticated MCP + Postgres.
-# Copy .env.docker.example to .env, fill the secrets, then: docker compose up -d --build
-#
-# Domains (point DNS A/AAAA records at this server):
-#   olegthelilfix.me       -> web  (frontend)
-#   www.olegthelilfix.me   -> redirect to apex
-#   cms.olegthelilfix.me   -> cms  (Strapi admin + API)
+# Production stack: Caddy terminates TLS and proxies the statically generated
+# Next.js application. All editorial content is bundled from /content at build
+# time, so production needs no CMS, database or content credentials.
 name: olegthelilfix
 
 x-logging: &default-logging
@@ -21,7 +17,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "443:443/udp" # HTTP/3
+      - "443:443/udp"
     environment:
       ACME_EMAIL: ${ACME_EMAIL:-hello@olegthelilfix.me}
     volumes:
@@ -31,95 +27,8 @@ services:
     depends_on:
       web:
         condition: service_healthy
-      cms:
-        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:2019/config/ >/dev/null || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-  db:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    logging: *default-logging
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: ${POSTGRES_ADMIN_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:?set POSTGRES_ADMIN_PASSWORD in .env}
-      STRAPI_DATABASE_NAME: ${STRAPI_DATABASE_NAME:-strapi}
-      STRAPI_DATABASE_USERNAME: ${STRAPI_DATABASE_USERNAME:-strapi}
-      STRAPI_DATABASE_PASSWORD: ${STRAPI_DATABASE_PASSWORD:?set STRAPI_DATABASE_PASSWORD in .env}
-    volumes:
-      - db-data:/var/lib/postgresql/data
-      # Creates separate least-privilege roles/databases on first init.
-      - ./db/init:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_ADMIN_USERNAME:-postgres} -d postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-
-  cms:
-    image: ${CMS_IMAGE:-olegthelilfix-cms}:${IMAGE_TAG:-local}
-    build: ./cms
-    restart: unless-stopped
-    logging: *default-logging
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      NODE_ENV: production
-      HOST: 0.0.0.0
-      PORT: 1337
-      # Behind Caddy: know the public https origin and trust proxy headers.
-      PUBLIC_URL: https://cms.olegthelilfix.me
-      IS_PROXIED: "true"
-      DATABASE_CLIENT: postgres
-      DATABASE_HOST: db
-      DATABASE_PORT: 5432
-      DATABASE_NAME: ${STRAPI_DATABASE_NAME:-strapi}
-      DATABASE_USERNAME: ${STRAPI_DATABASE_USERNAME:-strapi}
-      DATABASE_PASSWORD: ${STRAPI_DATABASE_PASSWORD:?set STRAPI_DATABASE_PASSWORD in .env}
-      DATABASE_SSL: "false"
-      APP_KEYS: ${APP_KEYS:?set APP_KEYS in .env}
-      API_TOKEN_SALT: ${API_TOKEN_SALT:?set API_TOKEN_SALT in .env}
-      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:?set ADMIN_JWT_SECRET in .env}
-      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT:?set TRANSFER_TOKEN_SALT in .env}
-      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
-      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY in .env}
-    volumes:
-      - cms-uploads:/opt/app/public/uploads
-    healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:1337/_health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 45s
-
-  mcp:
-    image: ${MCP_IMAGE:-olegthelilfix-mcp}:${IMAGE_TAG:-local}
-    build: ./mcp
-    restart: unless-stopped
-    logging: *default-logging
-    depends_on:
-      cms:
-        condition: service_healthy
-    # MCP is never exposed to the Internet. Connect through an SSH tunnel:
-    # ssh -N -L 3001:127.0.0.1:3001 deploy@SERVER
-    ports:
-      - "127.0.0.1:3001:3001"
-    environment:
-      NODE_ENV: production
-      PORT: 3001
-      STRAPI_URL: http://cms:1337
-      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN-}
-      MCP_ACCESS_TOKEN: ${MCP_ACCESS_TOKEN:?set MCP_ACCESS_TOKEN in .env}
-      MCP_WRITE_ENABLED: ${MCP_WRITE_ENABLED:-false}
-      MCP_ALLOWED_HOSTS: localhost,127.0.0.1
-    healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/readyz').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -130,13 +39,6 @@ services:
     build: .
     restart: unless-stopped
     logging: *default-logging
-    depends_on:
-      cms:
-        condition: service_healthy
-    environment:
-      NODE_ENV: production
-      # The frontend reaches the CMS over the internal compose network.
-      STRAPI_URL: http://cms:1337
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
       interval: 15s
@@ -145,7 +47,5 @@ services:
       start_period: 15s
 
 volumes:
-  db-data:
-  cms-uploads:
   caddy-data:
   caddy-config:
