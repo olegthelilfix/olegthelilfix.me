@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { Chip } from "@/components/Chip";
-import { journeyCategories } from "@/data/journey";
-import type { JourneyCategory, JourneyEvent } from "@/data/types";
+import { journeyCategories } from "@content/journey";
+import type { JourneyCategory, JourneyEvent } from "@content/types";
 import styles from "./journey.module.css";
 
 type Filter = JourneyCategory | "everything";

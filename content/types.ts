@@ -1,9 +1,6 @@
-// Content model for the archive. These interfaces are the stand-in for the
-// future Strapi content types: the mock modules that implement them return
-// plain facts only — no colours, transforms or layout. Presentation lives in
-// the components. Every content item carries an id, a `visibility` field
-// (all "public" in Stage 1, enforced later by the backend), and — where it
-// helps the "everything is connected" idea — light id relations.
+// Content model for the archive. Modules in this directory are the editorial
+// source of truth and contain facts only; presentation belongs in components.
+// Collection items carry stable ids and an explicit visibility value.
 
 export type Visibility = "public" | "unlisted" | "private";
 

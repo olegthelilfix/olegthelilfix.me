@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Chip } from "@/components/Chip";
-import type { Postcard } from "@/data/types";
+import type { Postcard } from "@content/types";
 import styles from "./postcards.module.css";
 
 type View = "desk" | "archive" | "map";

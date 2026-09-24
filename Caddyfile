@@ -26,9 +26,3 @@ olegthelilfix.me {
 www.olegthelilfix.me {
 	redir https://olegthelilfix.me{uri} permanent
 }
-
-# Strapi CMS admin + API
-cms.olegthelilfix.me {
-	import security
-	reverse_proxy cms:1337
-}

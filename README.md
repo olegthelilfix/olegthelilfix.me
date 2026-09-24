@@ -2,94 +2,53 @@
 
 Personal archive and digital cabinet of curiosities for Oleg Aleksandrov.
 
-The repository contains two applications, an MCP gateway and their production infrastructure:
+The site is a single Next.js 16 application. Editorial content is versioned
+with the code and compiled into the site:
 
-- `src/` — Next.js 16 App Router frontend;
-- `cms/` — Strapi 5 content management system;
-- `mcp/` — authenticated Streamable HTTP gateway for Strapi; writes are opt-in;
-- `docker-compose.yml` — Caddy, frontend, CMS, MCP and Postgres;
-- `.github/workflows/deploy.yml` — GHCR build and Hetzner deployment;
-- `src/data/` — bundled fallback content used when Strapi is unavailable.
+- `content/` - typed content files and editing guide;
+- `src/` - App Router pages, components and presentation;
+- `docker-compose.yml` - Next.js and Caddy production stack;
+- `.github/workflows/deploy.yml` - GHCR build and Hetzner deployment.
+
+There is no runtime CMS, content API or database.
 
 ## Local development
 
 Requirements: Node.js 22 and npm.
 
 ```bash
-# Frontend
 npm ci
 npm run dev
-
-# CMS, in a second terminal
-cd cms
-npm ci
-npm run develop
 ```
 
-The frontend is available at `http://localhost:3000`, and the CMS admin at
-`http://localhost:1337/admin`. `STRAPI_URL` defaults to
-`http://localhost:1337`; if Strapi is unavailable, pages use the fallback data.
+Open `http://localhost:3000`.
 
-Copy the example files only when local overrides are needed:
+## Editing content
+
+Edit the modules in [content/](./content/README.md). Pages consume them through
+`src/lib/content.ts`, which centralizes public visibility filtering.
+
+```text
+content/*.ts -> production build -> immutable Docker image -> Hetzner
+```
+
+Run the complete local verification before pushing:
 
 ```bash
-cp .env.example .env.local
-cp cms/.env.example cms/.env
+npm run check
+docker compose --env-file .env.docker.example config --quiet
+docker compose --env-file .env.docker.example build web
 ```
 
-## Verification
-
-```bash
-npm run check                       # frontend lint, types and production build
-cd cms && npm run build             # CMS TypeScript + admin build
-cd mcp && npm test                  # MCP build + auth/Strapi integration tests
-npm audit --omit=dev                # frontend production dependencies
-cd cms && npm audit --omit=dev      # CMS; see SECURITY.md for upstream exception
-```
-
-After starting a production server, verify the public surface:
+After starting a production build, the smoke test covers all public pages,
+metadata routes, static assets, 404 behavior and security headers:
 
 ```bash
 npm run smoke -- http://127.0.0.1:3000
 ```
 
-The smoke test covers every public page, metadata routes, the health endpoint,
-404 behavior and required security headers.
-
 ## Production
 
-Production is self-hosted with Docker Compose. GitHub Actions publishes
-commit-SHA-tagged application images to GHCR and deploys them to Hetzner over
-SSH. Caddy is the only Internet-facing service and publishes ports 80/443.
-Postgres, Next.js and Strapi stay on the internal network. The MCP gateway is
-published only on the server loopback address (`127.0.0.1:3001`) and is reached
-from Codex through an SSH tunnel plus a Bearer token.
-
-Do not expose CMS before its first owner account exists. Follow the bootstrap
-procedure in [DEPLOY.md](./DEPLOY.md), then complete
-[OWNER_CHECKLIST.md](./OWNER_CHECKLIST.md).
-
-For local Compose verification:
-
-```bash
-docker compose config --quiet
-docker compose up -d --build
-docker compose ps
-```
-
-## Content model
-
-Strapi collection endpoints enforce `visibility=public` in their controllers.
-The frontend additionally applies the same filter and follows every pagination
-page, so collections larger than the Strapi limit are not truncated.
-
-The current fallback/seed content is an initial catalogue rather than the full
-archive. Real photos and final collection totals remain an editorial launch
-task, documented in the owner checklist.
-
-## Operational documentation
-
-- [DEPLOY.md](./DEPLOY.md) — GitHub/Hetzner setup, bootstrap, deployment, backup and rollback runbook;
-- [OWNER_CHECKLIST.md](./OWNER_CHECKLIST.md) — actions that require domain/server/account ownership;
-- [SECURITY.md](./SECURITY.md) — security policy and known upstream dependency exception;
-- [CLAUDE.md](./CLAUDE.md) — detailed repository architecture and development conventions.
+GitHub Actions builds one commit-SHA-tagged web image, pushes it to GHCR and
+deploys it to Hetzner over SSH. Caddy is the only Internet-facing container.
+See [DEPLOY.md](./DEPLOY.md) for setup, migration and rollback.

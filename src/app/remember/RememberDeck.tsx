@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Memory } from "@/data/types";
+import type { Memory } from "@content/types";
 import styles from "./remember.module.css";
 
 export function RememberDeck({ memories }: { memories: Memory[] }) {

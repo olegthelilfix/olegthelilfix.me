@@ -4,8 +4,8 @@ import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Chip } from "@/components/Chip";
 import { sleeveGradient } from "@/lib/art";
-import type { ChaosCard } from "@/data/home";
-import type { VinylRecord, Hobby } from "@/data/types";
+import type { ChaosCard } from "@content/home";
+import type { VinylRecord, Hobby } from "@content/types";
 import styles from "./home.module.css";
 
 type Density = "calm" | "normal" | "oleg";
