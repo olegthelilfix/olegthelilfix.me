@@ -54,7 +54,16 @@ is stored on the server.
 ```text
 olegthelilfix.me        A     <SERVER_IPV4>
 www.olegthelilfix.me    A     <SERVER_IPV4>
+game.olegthelilfix.me   A     <SERVER_IPV4>
 ```
+
+`game.olegthelilfix.me` is ContentQuest
+([SocialCapitalRPG](https://github.com/olegthelilfix/SocialCapitalRPG)), a
+separate Compose stack on the same server. This Caddy terminates TLS for it and
+forwards it over the external docker network `edge` to that stack's internal
+Caddy (alias `contentquest-edge`). `scripts/remote-deploy.sh` creates `edge`
+when it is missing; until ContentQuest is deployed, only that hostname answers
+502.
 
 The old `cms.olegthelilfix.me` and `mcp.olegthelilfix.me` records are no
 longer needed and should be deleted. Add AAAA records only when IPv6 is

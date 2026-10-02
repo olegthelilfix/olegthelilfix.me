@@ -51,4 +51,7 @@ npm run smoke -- http://127.0.0.1:3000
 
 GitHub Actions builds one commit-SHA-tagged web image, pushes it to GHCR and
 deploys it to Hetzner over SSH. Caddy is the only Internet-facing container.
+It also fronts `game.olegthelilfix.me` (ContentQuest, a separate stack on the
+same server) over the shared external docker network `edge`; for a local
+`docker compose up`, create it once with `docker network create edge`.
 See [DEPLOY.md](./DEPLOY.md) for setup, migration and rollback.

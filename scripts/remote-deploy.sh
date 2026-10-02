@@ -78,6 +78,12 @@ compose() {
     docker compose -f "$compose_file" "$@"
 }
 
+# Shared with the ContentQuest stack (game.olegthelilfix.me); declared external
+# in docker-compose.yml, so it must exist before `compose up`.
+if ! docker network inspect edge >/dev/null 2>&1; then
+  docker network create edge >/dev/null
+fi
+
 compose config --quiet
 compose pull web caddy
 # --remove-orphans removes the retired Strapi, MCP and Postgres containers from
