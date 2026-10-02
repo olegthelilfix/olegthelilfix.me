@@ -1,6 +1,6 @@
 #!/bin/sh
 # Runs on the Hetzner host. The GHCR token is read from stdin and is never
-# written to the release directory or the server environment file.
+# written to disk.
 set -eu
 
 die() {
@@ -8,26 +8,18 @@ die() {
   exit 1
 }
 
-[ "$#" -eq 8 ] || die "expected: RELEASE_SHA MODE DEPLOY_ROOT WEB_IMAGE CMS_IMAGE MCP_IMAGE ARCHIVE REGISTRY_USER"
+[ "$#" -eq 5 ] || die "expected: RELEASE_SHA DEPLOY_ROOT WEB_IMAGE ARCHIVE REGISTRY_USER"
 
 release_sha=$1
-deploy_mode=$2
-deploy_root=$3
-web_image=$4
-cms_image=$5
-mcp_image=$6
-release_archive=$7
-registry_user=$8
+deploy_root=$2
+web_image=$3
+release_archive=$4
+registry_user=$5
 
 case "$release_sha" in
   ''|*[!0-9a-f]*) die "release SHA must contain lowercase hexadecimal characters only" ;;
 esac
 [ "${#release_sha}" -ge 7 ] && [ "${#release_sha}" -le 64 ] || die "invalid release SHA length"
-
-case "$deploy_mode" in
-  bootstrap|production) ;;
-  *) die "mode must be bootstrap or production" ;;
-esac
 
 case "$deploy_root" in
   /*) ;;
@@ -36,12 +28,12 @@ esac
 case "$deploy_root" in
   *[!A-Za-z0-9_./-]*) die "deploy root contains unsupported characters" ;;
 esac
-case "$web_image:$cms_image:$mcp_image" in
-  *[!a-z0-9_./:-]*) die "container image name contains unsupported characters" ;;
+case "$web_image" in
+  ghcr.io/*) ;;
+  *) die "the website image must come from ghcr.io" ;;
 esac
-case "$web_image:$cms_image:$mcp_image" in
-  ghcr.io/*:ghcr.io/*:ghcr.io/*) ;;
-  *) die "all application images must come from ghcr.io" ;;
+case "$web_image" in
+  *[!a-z0-9_./:-]*) die "container image name contains unsupported characters" ;;
 esac
 case "$registry_user" in
   ''|*[!A-Za-z0-9_-]*) die "invalid registry username" ;;
@@ -67,49 +59,14 @@ IFS= read -r registry_token || die "could not read the GHCR token from stdin"
 [ -n "$registry_token" ] || die "the GHCR token is empty"
 
 releases_dir="$deploy_root/releases"
-shared_dir="$deploy_root/shared"
 release_dir="$releases_dir/$release_sha"
-environment_file="$shared_dir/.env"
 compose_file="$release_dir/docker-compose.yml"
-bootstrap_file="$release_dir/docker-compose.bootstrap.yml"
 
-install -d -m 0750 "$deploy_root" "$releases_dir" "$shared_dir" "$release_dir"
+install -d -m 0750 "$deploy_root" "$releases_dir" "$release_dir"
 tar -xzf "$release_archive" -C "$release_dir"
 
 [ -f "$compose_file" ] || die "docker-compose.yml is missing from the release"
-[ -f "$bootstrap_file" ] || die "bootstrap Compose file is missing from the release"
-[ -x "$release_dir/scripts/generate-production-env.sh" ] || die "environment generator is missing"
-
-if [ ! -s "$environment_file" ]; then
-  if [ "$deploy_mode" != bootstrap ]; then
-    die "$environment_file does not exist; run the bootstrap deployment first"
-  fi
-  "$release_dir/scripts/generate-production-env.sh" "$environment_file"
-fi
-chmod 0600 "$environment_file"
-
-# Add MCP settings to environments created by releases that predate the MCP
-# gateway. The gateway access token can be generated safely here; the Strapi
-# API token must be created by the owner in Strapi after bootstrap.
-if ! grep -q '^MCP_ACCESS_TOKEN=' "$environment_file"; then
-  printf 'MCP_ACCESS_TOKEN=%s\n' "$(openssl rand -hex 32)" >> "$environment_file"
-fi
-if ! grep -q '^STRAPI_API_TOKEN=' "$environment_file"; then
-  printf 'STRAPI_API_TOKEN=\n' >> "$environment_file"
-fi
-if ! grep -q '^MCP_WRITE_ENABLED=' "$environment_file"; then
-  printf 'MCP_WRITE_ENABLED=false\n' >> "$environment_file"
-fi
-
-if [ "$deploy_mode" = production ] && ! grep -Eq '^STRAPI_API_TOKEN=.+$' "$environment_file"; then
-  die "STRAPI_API_TOKEN is empty in $environment_file; create a Custom Strapi API token and add it before production"
-fi
-
-ln -sfn "$environment_file" "$release_dir/.env"
-
-if [ "$deploy_mode" = bootstrap ] && [ -L "$deploy_root/current" ]; then
-  die "bootstrap has already completed; use production mode"
-fi
+[ -f "$release_dir/Caddyfile" ] || die "Caddyfile is missing from the release"
 
 printf '%s\n' "$registry_token" \
   | docker login ghcr.io --username "$registry_user" --password-stdin >/dev/null
@@ -117,36 +74,22 @@ registry_logged_in=true
 unset registry_token
 
 compose() {
-  WEB_IMAGE="$web_image" CMS_IMAGE="$cms_image" MCP_IMAGE="$mcp_image" IMAGE_TAG="$release_sha" \
-    docker compose --env-file "$environment_file" -f "$compose_file" "$@"
+  WEB_IMAGE="$web_image" IMAGE_TAG="$release_sha" \
+    docker compose -f "$compose_file" "$@"
 }
 
-bootstrap_compose() {
-  WEB_IMAGE="$web_image" CMS_IMAGE="$cms_image" MCP_IMAGE="$mcp_image" IMAGE_TAG="$release_sha" \
-    docker compose --env-file "$environment_file" \
-      -f "$compose_file" -f "$bootstrap_file" "$@"
-}
-
-if [ "$deploy_mode" = bootstrap ]; then
-  bootstrap_compose config --quiet
-  bootstrap_compose pull cms
-  bootstrap_compose up -d --no-build --wait --wait-timeout 300 db cms
-  bootstrap_compose ps
-else
-  compose config --quiet
-  compose pull web cms mcp
-  compose up -d --no-build --remove-orphans --wait --wait-timeout 300
-  compose ps
-fi
+compose config --quiet
+compose pull web caddy
+# --remove-orphans removes the retired Strapi, MCP and Postgres containers from
+# the old stack. Their named volumes are deliberately preserved for rollback.
+compose up -d --no-build --remove-orphans --wait --wait-timeout 180
+compose ps
 
 cat > "$release_dir/deployment.env" <<EOF
 RELEASE_SHA=$release_sha
-DEPLOY_MODE=$deploy_mode
 WEB_IMAGE=$web_image
-CMS_IMAGE=$cms_image
-MCP_IMAGE=$mcp_image
 EOF
 chmod 0640 "$release_dir/deployment.env"
 ln -sfn "$release_dir" "$deploy_root/current"
 
-echo "Deployment completed: $deploy_mode ($release_sha)"
+echo "Deployment completed: $release_sha"

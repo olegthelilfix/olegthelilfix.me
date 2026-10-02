@@ -14,8 +14,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Preserved original prototype — an archived artifact, not source we lint.
     "reference/**",
-    // The Strapi CMS is a separate app with its own toolchain.
+    // Local leftovers from the retired CMS/MCP installs are ignored by Git.
     "cms/**",
+    "mcp/**",
   ]),
 ]);
 
