@@ -146,7 +146,16 @@ Point these records to the Hetzner server:
 olegthelilfix.me        A     <SERVER_IPV4>
 www.olegthelilfix.me    A     <SERVER_IPV4>
 cms.olegthelilfix.me    A     <SERVER_IPV4>
+game.olegthelilfix.me   A     <SERVER_IPV4>
 ```
+
+`game.olegthelilfix.me` is ContentQuest
+([SocialCapitalRPG](https://github.com/olegthelilfix/SocialCapitalRPG)), a
+separate Compose stack on the same server. This Caddy terminates TLS for it and
+forwards it over the external docker network `edge` to that stack's internal
+Caddy (alias `contentquest-edge`). `scripts/remote-deploy.sh` creates `edge`
+when it is missing; until ContentQuest is deployed, only that hostname answers
+502.
 
 MCP deliberately has no public DNS record. Delete a pre-existing
 `mcp.olegthelilfix.me` A/AAAA record; Caddy does not route this hostname.

@@ -127,6 +127,12 @@ bootstrap_compose() {
       -f "$compose_file" -f "$bootstrap_file" "$@"
 }
 
+# Shared with the ContentQuest stack (game.olegthelilfix.me); declared external
+# in docker-compose.yml, so it must exist before `compose up`.
+if ! docker network inspect edge >/dev/null 2>&1; then
+  docker network create edge >/dev/null
+fi
+
 if [ "$deploy_mode" = bootstrap ]; then
   bootstrap_compose config --quiet
   bootstrap_compose pull cms

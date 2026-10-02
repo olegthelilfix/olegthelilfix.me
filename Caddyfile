@@ -16,6 +16,16 @@
 	}
 }
 
+# ContentQuest (repo olegthelilfix/SocialCapitalRPG): a separate Compose stack on
+# this server. Its own internal Caddy serves the web bundle and the API over
+# plain HTTP; it is reached over the shared external network `edge` by its alias
+# only (both stacks have a service named `caddy`). If that stack is down, only
+# this host answers 502.
+game.olegthelilfix.me {
+	import security
+	reverse_proxy contentquest-edge:80
+}
+
 # Frontend (Next.js)
 olegthelilfix.me {
 	import security

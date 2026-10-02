@@ -61,6 +61,9 @@ The smoke test covers every public page, metadata routes, the health endpoint,
 Production is self-hosted with Docker Compose. GitHub Actions publishes
 commit-SHA-tagged application images to GHCR and deploys them to Hetzner over
 SSH. Caddy is the only Internet-facing service and publishes ports 80/443.
+It also fronts `game.olegthelilfix.me` (ContentQuest, a separate stack on the
+same server) over the shared external docker network `edge`; for a local
+`docker compose up`, create it once with `docker network create edge`.
 Postgres, Next.js and Strapi stay on the internal network. The MCP gateway is
 published only on the server loopback address (`127.0.0.1:3001`) and is reached
 from Codex through an SSH tunnel plus a Bearer token.

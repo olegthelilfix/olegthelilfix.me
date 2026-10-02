@@ -28,6 +28,11 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
+    # `edge` is shared with the ContentQuest stack (game.olegthelilfix.me). Only
+    # Caddy joins it; the apps and Postgres stay on the default network.
+    networks:
+      - default
+      - edge
     depends_on:
       web:
         condition: service_healthy
@@ -143,6 +148,14 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
+
+networks:
+  # Created outside Compose so that either stack can start first and neither
+  # removes it on `down`. scripts/remote-deploy.sh creates it when missing; for a
+  # local run: docker network create edge
+  edge:
+    name: edge
+    external: true
 
 volumes:
   db-data:
