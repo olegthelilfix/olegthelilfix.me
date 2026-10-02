@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getProjects } from "@/lib/content";
-import { statusColor } from "@/data/projects";
+import { statusColor } from "@content/projects";
 import { diagramGradient } from "@/lib/art";
 import styles from "../supporting.module.css";
 

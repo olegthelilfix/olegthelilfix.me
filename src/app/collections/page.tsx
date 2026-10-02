@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { drawers } from "@/data/collections";
+import { drawers } from "@content/collections";
 import styles from "./collections.module.css";
 
 export const metadata: Metadata = {
